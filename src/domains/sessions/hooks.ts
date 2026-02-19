@@ -117,7 +117,7 @@ export function useStreamSession(sessionId: string) {
 
       try {
         const res = await fetch(
-          `${env.BACKEND_URL}/api/v1/sessions/${sessionId}/stream`,
+          `${env.BACKEND_URL}/api/v1/editor/sessions/${sessionId}/stream`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

@@ -4,7 +4,7 @@ import type { KBDTO, PaginatedResponse, CreateKBRequest, AddTextSourceRequest } 
 export const kbsSchema = {
   list: endpoint({
     method: "GET",
-    path: "/api/v1/kbs",
+    path: "/api/v1/editor/kbs",
     request: {
       query: t<{ page?: number; page_size?: number }>(),
     },
@@ -13,7 +13,7 @@ export const kbsSchema = {
 
   get: endpoint({
     method: "GET",
-    path: "/api/v1/kbs/:id",
+    path: "/api/v1/editor/kbs/:id",
     request: {
       path: t<{ id: string }>(),
     },
@@ -22,7 +22,7 @@ export const kbsSchema = {
 
   create: endpoint({
     method: "POST",
-    path: "/api/v1/kbs",
+    path: "/api/v1/editor/kbs",
     request: {
       body: t<CreateKBRequest>(),
     },
@@ -31,7 +31,7 @@ export const kbsSchema = {
 
   delete: endpoint({
     method: "DELETE",
-    path: "/api/v1/kbs/:id",
+    path: "/api/v1/editor/kbs/:id",
     request: {
       path: t<{ id: string }>(),
     },

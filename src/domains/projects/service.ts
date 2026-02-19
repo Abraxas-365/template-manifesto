@@ -10,7 +10,7 @@ import type {
 export const projectsSchema = {
   list: endpoint({
     method: "GET",
-    path: "/api/v1/projects",
+    path: "/api/v1/editor/projects",
     request: {
       query: t<{ page?: number; page_size?: number }>(),
     },
@@ -19,7 +19,7 @@ export const projectsSchema = {
 
   listMine: endpoint({
     method: "GET",
-    path: "/api/v1/projects",
+    path: "/api/v1/editor/projects",
     request: {
       query: t<{ mine: boolean; page?: number; page_size?: number }>(),
     },
@@ -28,7 +28,7 @@ export const projectsSchema = {
 
   get: endpoint({
     method: "GET",
-    path: "/api/v1/projects/:id",
+    path: "/api/v1/editor/projects/:id",
     request: {
       path: t<{ id: string }>(),
     },
@@ -37,7 +37,7 @@ export const projectsSchema = {
 
   create: endpoint({
     method: "POST",
-    path: "/api/v1/projects",
+    path: "/api/v1/editor/projects",
     request: {
       body: t<CreateProjectRequest>(),
     },
@@ -46,7 +46,7 @@ export const projectsSchema = {
 
   update: endpoint({
     method: "PUT",
-    path: "/api/v1/projects/:id",
+    path: "/api/v1/editor/projects/:id",
     request: {
       path: t<{ id: string }>(),
       body: t<UpdateProjectRequest>(),
@@ -56,7 +56,7 @@ export const projectsSchema = {
 
   delete: endpoint({
     method: "DELETE",
-    path: "/api/v1/projects/:id",
+    path: "/api/v1/editor/projects/:id",
     request: {
       path: t<{ id: string }>(),
     },

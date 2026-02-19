@@ -10,7 +10,7 @@ import type {
 export const sessionsSchema = {
   listByUser: endpoint({
     method: "GET",
-    path: "/api/v1/sessions",
+    path: "/api/v1/editor/sessions",
     request: {
       query: t<{ page?: number; page_size?: number }>(),
     },
@@ -19,7 +19,7 @@ export const sessionsSchema = {
 
   listByProject: endpoint({
     method: "GET",
-    path: "/api/v1/sessions/project/:projectId",
+    path: "/api/v1/editor/sessions/project/:projectId",
     request: {
       path: t<{ projectId: string }>(),
       query: t<{ page?: number; page_size?: number }>(),
@@ -29,7 +29,7 @@ export const sessionsSchema = {
 
   get: endpoint({
     method: "GET",
-    path: "/api/v1/sessions/:id",
+    path: "/api/v1/editor/sessions/:id",
     request: {
       path: t<{ id: string }>(),
     },
@@ -38,7 +38,7 @@ export const sessionsSchema = {
 
   create: endpoint({
     method: "POST",
-    path: "/api/v1/sessions/project/:projectId",
+    path: "/api/v1/editor/sessions/project/:projectId",
     request: {
       path: t<{ projectId: string }>(),
       body: t<CreateSessionRequest>(),
@@ -48,7 +48,7 @@ export const sessionsSchema = {
 
   update: endpoint({
     method: "PUT",
-    path: "/api/v1/sessions/:id",
+    path: "/api/v1/editor/sessions/:id",
     request: {
       path: t<{ id: string }>(),
       body: t<UpdateSessionRequest>(),
@@ -58,7 +58,7 @@ export const sessionsSchema = {
 
   delete: endpoint({
     method: "DELETE",
-    path: "/api/v1/sessions/:id",
+    path: "/api/v1/editor/sessions/:id",
     request: {
       path: t<{ id: string }>(),
     },

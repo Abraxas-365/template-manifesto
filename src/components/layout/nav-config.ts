@@ -2,7 +2,6 @@ import type { LucideIcon } from "lucide-react";
 import {
   Home,
   FolderKanban,
-  FileText,
   BarChart3,
   Users,
   Settings,
@@ -43,12 +42,6 @@ export const navConfig: NavGroup[] = [
           { label: "All Projects", to: "/projects" },
           { label: "My Projects", to: "/projects/mine" },
         ],
-      },
-      {
-        label: "Outcomes",
-        to: "/outcomes",
-        icon: FileText,
-        children: [{ label: "All Outcomes", to: "/outcomes" }],
       },
       {
         label: "Knowledge Bases",
