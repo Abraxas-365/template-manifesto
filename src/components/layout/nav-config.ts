@@ -6,6 +6,7 @@ import {
   BarChart3,
   Users,
   Settings,
+  BookOpen,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -48,6 +49,11 @@ export const navConfig: NavGroup[] = [
         to: "/outcomes",
         icon: FileText,
         children: [{ label: "All Outcomes", to: "/outcomes" }],
+      },
+      {
+        label: "Knowledge Bases",
+        to: "/kbs",
+        icon: BookOpen,
       },
     ],
   },

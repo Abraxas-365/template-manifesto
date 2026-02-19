@@ -8,6 +8,9 @@ import { env } from "@/lib/env";
 import { authSchema } from "./auth/service";
 import { invitationsSchema } from "./invitations/service";
 import { usersSchema } from "./users/service";
+import { projectsSchema } from "./projects/service";
+import { sessionsSchema } from "./sessions/service";
+import { kbsSchema } from "./kbs/service";
 
 // ─── Session Expiry Handler ─────────────────────────────────────────────────
 
@@ -23,6 +26,9 @@ const schema = {
   auth: authSchema,
   invitations: invitationsSchema,
   users: usersSchema,
+  projects: projectsSchema,
+  sessions: sessionsSchema,
+  kbs: kbsSchema,
 };
 
 const client = createApiClient({
