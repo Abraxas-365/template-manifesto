@@ -1,0 +1,218 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 1.75rem;
+  --radius-pill: 9999px;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Brand palette direct-access tokens */
+  --color-pa-yellow: #ffa600;
+  --color-pa-aqua: #2bb6b7;
+  --color-pa-blue: #2161c2;
+  --color-pa-info: #1b9cfc;
+  --color-pa-success: #2ecc71;
+  --color-pa-error: #e74c3c;
+  --color-pa-pink: #ed6a82;
+  --color-pa-grey: #f3f3f3;
+
+  /* Font families */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+
+  /* Shadow tokens */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-3: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #2161c2;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f3f3;
+  --secondary-foreground: #000000;
+  --muted: #f3f3f3;
+  --muted-foreground: #6b7280;
+  --accent: #ffa600;
+  --accent-foreground: #000000;
+  --destructive: #e74c3c;
+  --border: #d4d4d4;
+  --input: #d4d4d4;
+  --ring: #1b9cfc;
+  --chart-1: #2161c2;
+  --chart-2: #2bb6b7;
+  --chart-3: #ffa600;
+  --chart-4: #ed6a82;
+  --chart-5: #2ecc71;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #2161c2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f3f3;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #d4d4d4;
+  --sidebar-ring: #1b9cfc;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  .text-h1 {
+    font-size: 2.75rem;
+    line-height: 1.1;
+    font-weight: 700;
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
+  .text-h1-display {
+    font-size: 5rem;
+    line-height: 0.95;
+    font-weight: 800;
+    font-family: var(--font-display);
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+  }
+  .text-h2 {
+    font-size: 2rem;
+    line-height: 1.15;
+    font-weight: 700;
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  .text-h3 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    font-weight: 600;
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+  .text-body {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    font-weight: 400;
+    font-family: var(--font-sans);
+  }
+  .text-body-strong {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    font-weight: 600;
+    font-family: var(--font-sans);
+  }
+  .text-caption {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    font-weight: 400;
+    font-family: var(--font-sans);
+    letter-spacing: 0.01em;
+  }
+  .text-footnote {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    font-weight: 400;
+    font-family: var(--font-sans);
+    color: var(--muted-foreground);
+  }
+  .prose {
+    max-width: 65ch;
+  }
+
+  /* TipTap Editor */
+  .tiptap {
+    min-height: 200px;
+    outline: none;
+  }
+  .tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    @apply text-muted-foreground;
+  }
+  .tiptap h1 {
+    @apply text-2xl font-bold;
+  }
+  .tiptap h2 {
+    @apply text-xl font-semibold;
+  }
+  .tiptap h3 {
+    @apply text-lg font-semibold;
+  }
+  .tiptap p {
+    @apply my-1;
+  }
+  .tiptap ul {
+    @apply ml-6 list-disc;
+  }
+  .tiptap ol {
+    @apply ml-6 list-decimal;
+  }
+  .tiptap li {
+    @apply my-0.5;
+  }
+  .tiptap blockquote {
+    @apply border-l-4 border-border pl-4 italic text-muted-foreground;
+  }
+  .tiptap pre {
+    @apply my-2 rounded bg-muted p-3 font-mono text-sm;
+  }
+  .tiptap code {
+    @apply rounded bg-muted px-1 py-0.5 font-mono text-sm;
+  }
+  .tiptap hr {
+    @apply my-4 border-border;
+  }
+}
