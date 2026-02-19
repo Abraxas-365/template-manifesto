@@ -67,7 +67,7 @@ export const sessionsSchema = {
 
   archive: endpoint({
     method: "POST",
-    path: "/api/v1/sessions/:id/archive",
+    path: "/api/v1/editor/sessions/:id/archive",
     request: {
       path: t<{ id: string }>(),
     },
@@ -76,7 +76,7 @@ export const sessionsSchema = {
 
   clearHistory: endpoint({
     method: "DELETE",
-    path: "/api/v1/sessions/:id/history",
+    path: "/api/v1/editor/sessions/:id/history",
     request: {
       path: t<{ id: string }>(),
     },
@@ -85,7 +85,7 @@ export const sessionsSchema = {
 
   run: endpoint({
     method: "POST",
-    path: "/api/v1/sessions/:id/run",
+    path: "/api/v1/editor/sessions/:id/run",
     request: {
       path: t<{ id: string }>(),
       body: t<{ message: string }>(),

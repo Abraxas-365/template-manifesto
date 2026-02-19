@@ -40,7 +40,7 @@ export const kbsSchema = {
 
   addTextSource: endpoint({
     method: "POST",
-    path: "/api/v1/kbs/:id/sources/text",
+    path: "/api/v1/editor/kbs/:id/sources/text",
     request: {
       path: t<{ id: string }>(),
       body: t<AddTextSourceRequest>(),
@@ -50,7 +50,7 @@ export const kbsSchema = {
 
   removeSource: endpoint({
     method: "DELETE",
-    path: "/api/v1/kbs/:id/sources/:sourceId",
+    path: "/api/v1/editor/kbs/:id/sources/:sourceId",
     request: {
       path: t<{ id: string; sourceId: string }>(),
     },

@@ -65,7 +65,7 @@ export const projectsSchema = {
 
   attachKB: endpoint({
     method: "POST",
-    path: "/api/v1/projects/:id/kb",
+    path: "/api/v1/editor/projects/:id/kb",
     request: {
       path: t<{ id: string }>(),
       body: t<AttachKBRequest>(),
@@ -75,7 +75,7 @@ export const projectsSchema = {
 
   detachKB: endpoint({
     method: "DELETE",
-    path: "/api/v1/projects/:id/kb",
+    path: "/api/v1/editor/projects/:id/kb",
     request: {
       path: t<{ id: string }>(),
     },

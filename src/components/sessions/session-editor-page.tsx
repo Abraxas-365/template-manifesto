@@ -5,26 +5,133 @@ import {
   Send,
   Square,
   Trash2,
-  Loader2,
   Bot,
   User,
   Wrench,
+  FileText,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { useSession, useClearHistory, useStreamSession } from "@/domains/sessions/hooks";
+import {
+  useSession,
+  useClearHistory,
+  useStreamSession,
+} from "@/domains/sessions/hooks";
 import type { SSEEvent, MessageRecord } from "@/domains/sessions/types";
+
+function DocumentEditor({ content }: { content: string }) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: "Your document will appear here…",
+      }),
+    ],
+    content: content || "",
+    editable: false,
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[200px] px-6 py-4",
+      },
+    },
+  });
+
+  // Sync content when session data updates
+  useEffect(() => {
+    if (editor && content !== undefined) {
+      const currentContent = editor.getHTML();
+      if (currentContent !== content) {
+        editor.commands.setContent(content || "");
+      }
+    }
+  }, [editor, content]);
+
+  return <EditorContent editor={editor} />;
+}
+
+function ChatMessage({
+  msg,
+  isLast,
+}: {
+  msg: MessageRecord;
+  isLast: boolean;
+}) {
+  const isUser = msg.role === "user";
+
+  return (
+    <div
+      className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""} ${isLast ? "" : ""}`}
+    >
+      {/* Avatar */}
+      <div
+        className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
+          isUser
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-muted-foreground"
+        }`}
+      >
+        {isUser ? <User className="size-4" /> : <Bot className="size-4" />}
+      </div>
+
+      {/* Message bubble */}
+      <div
+        className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+          isUser
+            ? "bg-primary text-primary-foreground rounded-br-md"
+            : "bg-muted rounded-bl-md"
+        }`}
+      >
+        {isUser ? (
+          <p className="whitespace-pre-wrap">{msg.content}</p>
+        ) : (
+          <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {msg.content}
+            </ReactMarkdown>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ToolEventBadge({ event }: { event: SSEEvent }) {
+  const isDone = event.type === "tool_result";
+
+  return (
+    <div className="flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-xs">
+      {isDone ? (
+        <CheckCircle2 className="text-pa-success size-3" />
+      ) : (
+        <Circle className="text-muted-foreground size-3 animate-pulse" />
+      )}
+      <Wrench className="text-muted-foreground size-3" />
+      <span className="font-mono text-[11px]">{event.tool_name}</span>
+    </div>
+  );
+}
 
 export function SessionEditorPage() {
   const { sessionId } = useParams({
@@ -40,16 +147,19 @@ export function SessionEditorPage() {
   const [toolEvents, setToolEvents] = useState<SSEEvent[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Derive display messages: server data + optimistic pending messages during streaming
+  // Filter: no tool messages, no empty assistant messages
   const displayMessages = useMemo(() => {
     const serverMessages = session?.messages ?? [];
-    if (pendingMessages.length > 0) {
-      return [...serverMessages, ...pendingMessages];
-    }
-    return serverMessages;
+    const all =
+      pendingMessages.length > 0
+        ? [...serverMessages, ...pendingMessages]
+        : serverMessages;
+    return all.filter(
+      (m) => m.role !== "tool" && !(m.role === "assistant" && !m.content),
+    );
   }, [session?.messages, pendingMessages]);
 
-  // Auto-scroll on new messages
+  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayMessages, streamedText]);
@@ -61,7 +171,6 @@ export function SessionEditorPage() {
     setInput("");
     setToolEvents([]);
 
-    // Optimistically add user message
     const userMsg: MessageRecord = {
       role: "user",
       content: message,
@@ -78,7 +187,6 @@ export function SessionEditorPage() {
       }
     });
 
-    // After stream completes, session will be refetched; clear pending
     setPendingMessages([]);
   }, [input, isStreaming, stream]);
 
@@ -101,68 +209,99 @@ export function SessionEditorPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-[600px]" />
+      <div className="flex h-[calc(100vh-8rem)] flex-col gap-4 p-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="size-9 rounded-md" />
+          <Skeleton className="h-6 w-48" />
+        </div>
+        <Skeleton className="flex-1 rounded-xl" />
       </div>
     );
   }
 
   if (!session) {
-    return <p className="text-muted-foreground">Session not found.</p>;
+    return (
+      <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+        <div className="text-center">
+          <FileText className="text-muted-foreground mx-auto mb-3 size-12" />
+          <p className="text-muted-foreground text-lg">Session not found.</p>
+          <Button variant="outline" className="mt-4" asChild>
+            <Link to="/">Go Home</Link>
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col gap-4">
+    <div className="flex h-[calc(100vh-8rem)] flex-col gap-3">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild>
-          <Link
-            to="/projects/$projectId"
-            params={{ projectId: session.project_id }}
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
-        </Button>
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold">{session.name}</h2>
+      <div className="flex items-center gap-3 px-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="size-8" asChild>
+              <Link
+                to="/projects/$projectId"
+                params={{ projectId: session.project_id }}
+              >
+                <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Back to project</TooltipContent>
+        </Tooltip>
+
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display truncate text-lg font-semibold leading-tight">
+            {session.name}
+          </h2>
           {session.document.title && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground truncate text-xs">
               {session.document.title}
             </p>
           )}
         </div>
-        <Badge variant={session.status === "active" ? "default" : "secondary"}>
+
+        <Badge
+          variant={session.status === "active" ? "default" : "secondary"}
+          className="shrink-0"
+        >
           {session.status}
         </Badge>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleClearHistory}
-          disabled={clearHistory.isPending}
-        >
-          <Trash2 className="size-4" />
-        </Button>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={handleClearHistory}
+              disabled={clearHistory.isPending}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Clear history</TooltipContent>
+        </Tooltip>
       </div>
 
-      {/* Main content: Document + Chat side by side */}
-      <ResizablePanelGroup className="flex-1 rounded-lg border">
+      {/* Main layout */}
+      <ResizablePanelGroup className="flex-1 overflow-hidden rounded-xl border shadow-sm">
         {/* Document panel */}
-        <ResizablePanel defaultSize={50} minSize={30}>
+        <ResizablePanel defaultSize={50} minSize={25}>
           <div className="flex h-full flex-col">
-            <div className="border-b px-4 py-2">
+            <div className="flex items-center gap-2 border-b px-4 py-2.5">
+              <FileText className="text-muted-foreground size-4" />
               <h3 className="text-sm font-medium">Document</h3>
+              {session.document.versions &&
+                session.document.versions.length > 0 && (
+                  <Badge variant="outline" className="ml-auto text-[10px]">
+                    v{session.document.versions.length}
+                  </Badge>
+                )}
             </div>
-            <ScrollArea className="flex-1 p-4">
-              {session.document.content ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown>{session.document.content}</ReactMarkdown>
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-sm italic">
-                  Empty document. Use the chat to start editing.
-                </p>
-              )}
+            <ScrollArea className="flex-1">
+              <DocumentEditor content={session.document.content} />
             </ScrollArea>
           </div>
         </ResizablePanel>
@@ -170,93 +309,82 @@ export function SessionEditorPage() {
         <ResizableHandle withHandle />
 
         {/* Chat panel */}
-        <ResizablePanel defaultSize={50} minSize={30}>
-          <div className="flex h-full flex-col">
-            <div className="border-b px-4 py-2">
+        <ResizablePanel defaultSize={50} minSize={25}>
+          <div className="flex h-full flex-col bg-background">
+            <div className="flex items-center gap-2 border-b px-4 py-2.5">
+              <Bot className="text-muted-foreground size-4" />
               <h3 className="text-sm font-medium">Chat</h3>
+              {isStreaming && (
+                <Badge
+                  variant="outline"
+                  className="ml-auto animate-pulse text-[10px]"
+                >
+                  streaming
+                </Badge>
+              )}
             </div>
 
-            {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="flex flex-col gap-4">
-                {displayMessages
-                  .filter((m) => m.role !== "tool")
-                  .map((msg, i) => (
-                    <div
-                      key={i}
-                      className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}
-                    >
-                      {msg.role === "assistant" && (
-                        <div className="bg-muted flex size-7 shrink-0 items-center justify-center rounded-full">
-                          <Bot className="size-4" />
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                          msg.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
-                        }`}
-                      >
-                        {msg.role === "assistant" ? (
-                          <div className="prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
-                          </div>
-                        ) : (
-                          msg.content
-                        )}
-                      </div>
-                      {msg.role === "user" && (
-                        <div className="bg-primary flex size-7 shrink-0 items-center justify-center rounded-full">
-                          <User className="text-primary-foreground size-4" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
+            {/* Messages area */}
+            <ScrollArea className="flex-1">
+              <div className="flex flex-col gap-4 p-4">
+                {displayMessages.length === 0 && !isStreaming && (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Bot className="text-muted-foreground/50 mb-3 size-10" />
+                    <p className="text-muted-foreground text-sm">
+                      Send a message to start editing your document.
+                    </p>
+                  </div>
+                )}
 
-                {/* Streaming response */}
+                {displayMessages.map((msg, i) => (
+                  <ChatMessage
+                    key={`${msg.role}-${msg.created_at}-${i}`}
+                    msg={msg}
+                    isLast={i === displayMessages.length - 1}
+                  />
+                ))}
+
+                {/* Streaming assistant response */}
                 {isStreaming && streamedText && (
                   <div className="flex gap-3">
-                    <div className="bg-muted flex size-7 shrink-0 items-center justify-center rounded-full">
+                    <div className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-full">
                       <Bot className="size-4" />
                     </div>
-                    <div className="bg-muted max-w-[80%] rounded-lg px-3 py-2 text-sm">
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <ReactMarkdown>{streamedText}</ReactMarkdown>
+                    <div className="bg-muted max-w-[85%] rounded-2xl rounded-bl-md px-4 py-2.5 text-sm leading-relaxed">
+                      <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {streamedText}
+                        </ReactMarkdown>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Tool events */}
+                {/* Tool events as compact pills */}
                 {toolEvents.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="flex flex-col gap-1">
-                      {toolEvents.map((ev, i) => (
-                        <div
-                          key={i}
-                          className="text-muted-foreground flex items-center gap-2 text-xs"
-                        >
-                          <Wrench className="size-3" />
-                          <span className="font-mono">
-                            {ev.tool_name}
-                          </span>
-                          {ev.type === "tool_result" && (
-                            <Badge variant="outline" className="text-xs">
-                              done
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </>
+                  <div className="flex flex-wrap gap-1.5 pl-11">
+                    {toolEvents.map((ev, i) => (
+                      <ToolEventBadge key={i} event={ev} />
+                    ))}
+                  </div>
                 )}
 
+                {/* Thinking indicator */}
                 {isStreaming && !streamedText && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Loader2 className="size-4 animate-spin" />
-                    <span className="text-muted-foreground">Thinking...</span>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-full">
+                      <Bot className="size-4" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <span className="bg-muted-foreground/50 size-1.5 animate-bounce rounded-full [animation-delay:0ms]" />
+                        <span className="bg-muted-foreground/50 size-1.5 animate-bounce rounded-full [animation-delay:150ms]" />
+                        <span className="bg-muted-foreground/50 size-1.5 animate-bounce rounded-full [animation-delay:300ms]" />
+                      </div>
+                      <span className="text-muted-foreground text-xs">
+                        Thinking...
+                      </span>
+                    </div>
                   </div>
                 )}
 
@@ -264,36 +392,52 @@ export function SessionEditorPage() {
               </div>
             </ScrollArea>
 
-            {/* Input */}
-            <div className="border-t p-4">
-              <div className="flex gap-2">
+            {/* Input area */}
+            <div className="border-t p-3">
+              <div className="flex items-end gap-2">
                 <Textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask the AI to edit your document..."
-                  rows={2}
-                  className="min-h-[60px] resize-none"
+                  placeholder={
+                    session.status !== "active"
+                      ? "Session is archived"
+                      : "Ask the AI to edit your document..."
+                  }
+                  rows={1}
+                  className="max-h-32 min-h-[44px] resize-none rounded-xl"
                   disabled={isStreaming || session.status !== "active"}
                 />
                 {isStreaming ? (
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={abort}
-                    className="shrink-0 self-end"
-                  >
-                    <Square className="size-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={abort}
+                        className="size-10 shrink-0 rounded-xl"
+                      >
+                        <Square className="size-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Stop generating</TooltipContent>
+                  </Tooltip>
                 ) : (
-                  <Button
-                    size="icon"
-                    onClick={handleSend}
-                    disabled={!input.trim() || session.status !== "active"}
-                    className="shrink-0 self-end"
-                  >
-                    <Send className="size-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        onClick={handleSend}
+                        disabled={
+                          !input.trim() || session.status !== "active"
+                        }
+                        className="size-10 shrink-0 rounded-xl"
+                      >
+                        <Send className="size-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Send message</TooltipContent>
+                  </Tooltip>
                 )}
               </div>
             </div>
