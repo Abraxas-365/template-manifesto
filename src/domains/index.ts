@@ -7,7 +7,6 @@ import {
 import { env } from "@/lib/env";
 import { authSchema } from "./auth/service";
 import { invitationsSchema } from "./invitations/service";
-import { projectsSchema } from "./projects/service";
 import { usersSchema } from "./users/service";
 
 // ─── Session Expiry Handler ─────────────────────────────────────────────────
@@ -22,7 +21,6 @@ export function setSessionExpiryHandler(handler: (() => void) | null) {
 
 const schema = {
   auth: authSchema,
-  projects: projectsSchema,
   invitations: invitationsSchema,
   users: usersSchema,
 };
