@@ -94,6 +94,19 @@ export function useClearHistory() {
   });
 }
 
+export function useSaveDocument() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: api.sessions.saveDocument.$mutationFn(),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: api.sessions.get.$key({ path: { id: variables.path.id } }),
+      });
+    },
+  });
+}
+
 export function useRunSession() {
   return useMutation({
     mutationFn: api.sessions.run.$mutationFn(),

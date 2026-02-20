@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { useParams, Link } from "@tanstack/react-router";
+import { useState, useRef, useEffect, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
+import { useParams, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Send,
@@ -11,6 +11,8 @@ import {
   FileText,
   CheckCircle2,
   Circle,
+  ShieldAlert,
+  Save,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -27,6 +29,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import ImageExtension from "@tiptap/extension-image";
 import { common, createLowlight } from "lowlight";
 import { marked } from "marked";
+import TurndownService from "turndown";
 import { EditorToolbar } from "./editor-toolbar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -46,11 +49,14 @@ import {
 import {
   useSession,
   useClearHistory,
+  useSaveDocument,
   useStreamSession,
 } from "@/domains/sessions/hooks";
+import { useGeneratePolicy } from "@/domains/policies/hooks";
 import type { SSEEvent, MessageRecord } from "@/domains/sessions/types";
 
 const lowlight = createLowlight(common);
+const turndown = new TurndownService({ headingStyle: "atx", codeBlockStyle: "fenced" });
 
 // Convert markdown to HTML using `marked` — tiptap-markdown's setContent()
 // override is broken with Tiptap v3, so we do the conversion ourselves.
@@ -59,69 +65,82 @@ function markdownToHtml(md: string): string {
   return marked.parse(md, { async: false, gfm: true, breaks: false }) as string;
 }
 
-function DocumentEditor({ content }: { content: string }) {
-  const htmlContent = useMemo(() => markdownToHtml(content), [content]);
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        codeBlock: false, // replaced by CodeBlockLowlight
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
-      }),
-      Placeholder.configure({
-        placeholder: "Start writing or let the AI generate content…",
-      }),
-      Underline,
-      LinkExtension.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: "text-primary underline underline-offset-4 cursor-pointer",
-        },
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Highlight.configure({
-        multicolor: false,
-      }),
-      TextStyle,
-      Color,
-      ImageExtension.configure({
-        inline: false,
-        allowBase64: true,
-      }),
-    ],
-    content: htmlContent,
-    editable: true,
-    editorProps: {
-      attributes: {
-        class: "tiptap-editor focus:outline-none min-h-[300px] px-8 py-6",
-      },
-    },
-  });
-
-  // Sync when backend content updates (e.g. after AI edits the document)
-  useEffect(() => {
-    if (editor && content !== undefined) {
-      const newHtml = markdownToHtml(content);
-      const currentHtml = editor.getHTML();
-      if (currentHtml !== newHtml) {
-        editor.commands.setContent(newHtml);
-      }
-    }
-  }, [editor, content]);
-
-  return (
-    <div className="flex h-full flex-col bg-white">
-      <EditorToolbar editor={editor} />
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <EditorContent editor={editor} />
-      </div>
-    </div>
-  );
+export interface DocumentEditorHandle {
+  getMarkdown: () => string;
 }
+
+const DocumentEditor = forwardRef<DocumentEditorHandle, { content: string }>(
+  function DocumentEditor({ content }, ref) {
+    const htmlContent = useMemo(() => markdownToHtml(content), [content]);
+
+    const editor = useEditor({
+      extensions: [
+        StarterKit.configure({
+          codeBlock: false, // replaced by CodeBlockLowlight
+        }),
+        CodeBlockLowlight.configure({
+          lowlight,
+        }),
+        Placeholder.configure({
+          placeholder: "Start writing or let the AI generate content…",
+        }),
+        Underline,
+        LinkExtension.configure({
+          openOnClick: false,
+          HTMLAttributes: {
+            class: "text-primary underline underline-offset-4 cursor-pointer",
+          },
+        }),
+        TextAlign.configure({
+          types: ["heading", "paragraph"],
+        }),
+        Highlight.configure({
+          multicolor: false,
+        }),
+        TextStyle,
+        Color,
+        ImageExtension.configure({
+          inline: false,
+          allowBase64: true,
+        }),
+      ],
+      content: htmlContent,
+      editable: true,
+      editorProps: {
+        attributes: {
+          class: "tiptap-editor focus:outline-none min-h-[300px] px-8 py-6",
+        },
+      },
+    });
+
+    useImperativeHandle(ref, () => ({
+      getMarkdown: () => {
+        if (!editor) return "";
+        return turndown.turndown(editor.getHTML());
+      },
+    }), [editor]);
+
+    // Sync when backend content updates (e.g. after AI edits the document)
+    useEffect(() => {
+      if (editor && content !== undefined) {
+        const newHtml = markdownToHtml(content);
+        const currentHtml = editor.getHTML();
+        if (currentHtml !== newHtml) {
+          editor.commands.setContent(newHtml);
+        }
+      }
+    }, [editor, content]);
+
+    return (
+      <div className="flex h-full flex-col bg-white">
+        <EditorToolbar editor={editor} />
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <EditorContent editor={editor} />
+        </div>
+      </div>
+    );
+  },
+);
 
 function ChatMessage({ msg }: { msg: MessageRecord }) {
   const isUser = msg.role === "user";
@@ -195,8 +214,12 @@ export function SessionEditorPage() {
   const { sessionId } = useParams({
     from: "/_authenticated/sessions/$sessionId",
   });
+  const navigate = useNavigate();
   const { data: session, isLoading } = useSession(sessionId);
   const clearHistory = useClearHistory();
+  const saveDocument = useSaveDocument();
+  const generatePolicy = useGeneratePolicy();
+  const editorRef = useRef<DocumentEditorHandle>(null);
   const { stream, abort, isStreaming, streamedText } =
     useStreamSession(sessionId);
 
@@ -255,11 +278,40 @@ export function SessionEditorPage() {
     }
   };
 
+  const handleGeneratePolicy = async () => {
+    try {
+      const result = await generatePolicy.mutateAsync({
+        path: { sessionId },
+      });
+      toast.success("Policy generated");
+      void navigate({
+        to: "/policies/$policyId",
+        params: { policyId: result.id },
+      });
+    } catch {
+      // global error handler
+    }
+  };
+
   const handleClearHistory = async () => {
     try {
       await clearHistory.mutateAsync({ path: { id: sessionId } });
       setPendingMessages([]);
       toast.success("History cleared");
+    } catch {
+      // global error handler
+    }
+  };
+
+  const handleSaveDocument = async () => {
+    const content = editorRef.current?.getMarkdown();
+    if (!content) return;
+    try {
+      await saveDocument.mutateAsync({
+        path: { id: sessionId },
+        body: { content },
+      });
+      toast.success("Document saved");
     } catch {
       // global error handler
     }
@@ -330,6 +382,21 @@ export function SessionEditorPage() {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGeneratePolicy}
+              disabled={generatePolicy.isPending || session.status !== "active"}
+            >
+              <ShieldAlert className="size-4" />
+              {generatePolicy.isPending ? "Generating..." : "Generate Policy"}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Generate ISO 27001 policy from this session</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
               variant="ghost"
               size="icon"
               className="size-8"
@@ -355,13 +422,29 @@ export function SessionEditorPage() {
               <h3 className="text-sm font-medium">Document</h3>
               {session.document.versions &&
                 session.document.versions.length > 0 && (
-                  <Badge variant="outline" className="ml-auto text-[10px]">
+                  <Badge variant="outline" className="text-[10px]">
                     v{session.document.versions.length}
                   </Badge>
                 )}
+              <div className="ml-auto">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-7"
+                      onClick={handleSaveDocument}
+                      disabled={saveDocument.isPending || session.status !== "active"}
+                    >
+                      <Save className="size-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Save document</TooltipContent>
+                </Tooltip>
+              </div>
             </div>
             <div className="min-h-0 flex-1">
-              <DocumentEditor content={session.document.content} />
+              <DocumentEditor ref={editorRef} content={session.document.content} />
             </div>
           </div>
         </ResizablePanel>

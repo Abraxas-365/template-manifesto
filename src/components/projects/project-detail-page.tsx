@@ -8,6 +8,7 @@ import {
   Settings,
   BookOpen,
   Wrench,
+  ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,12 @@ export function ProjectDetailPage() {
             </p>
           )}
         </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/policies" search={{ projectId }}>
+            <ShieldAlert className="size-4" />
+            Policies
+          </Link>
+        </Button>
         <Button variant="outline" size="sm" asChild>
           <Link
             to="/projects/$projectId/settings"

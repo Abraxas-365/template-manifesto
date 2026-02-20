@@ -11,6 +11,7 @@ import { usersSchema } from "./users/service";
 import { projectsSchema } from "./projects/service";
 import { sessionsSchema } from "./sessions/service";
 import { kbsSchema } from "./kbs/service";
+import { policiesSchema } from "./policies/service";
 
 // ─── Session Expiry Handler ─────────────────────────────────────────────────
 
@@ -29,11 +30,12 @@ const schema = {
   projects: projectsSchema,
   sessions: sessionsSchema,
   kbs: kbsSchema,
+  policies: policiesSchema,
 };
 
 const client = createApiClient({
   baseUrl: env.BACKEND_URL,
-  timeoutMs: 15_000,
+  timeoutMs: 60_000,
   credentials: "include",
   auth: tokenAuth(() => null, {
     onRefresh: async () => {
