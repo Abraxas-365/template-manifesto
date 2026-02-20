@@ -74,7 +74,7 @@ export function CreateSessionDialog({ projectId }: { projectId: string }) {
             <div>
               <DialogTitle>Create Session</DialogTitle>
               <DialogDescription>
-                Start a new policy drafting session
+                Start a new document drafting session
               </DialogDescription>
             </div>
           </div>
@@ -84,7 +84,7 @@ export function CreateSessionDialog({ projectId }: { projectId: string }) {
             <Label htmlFor="session-name">Session Name</Label>
             <Input
               id="session-name"
-              placeholder="e.g. Access Control Policy v2"
+              placeholder="e.g. Access Control Draft v2"
               {...form.register("name", { required: true })}
             />
           </div>
@@ -92,7 +92,7 @@ export function CreateSessionDialog({ projectId }: { projectId: string }) {
             <Label htmlFor="doc-title">Document Title</Label>
             <Input
               id="doc-title"
-              placeholder="e.g. Information Security Policy"
+              placeholder="e.g. Information Security Document"
               {...form.register("title")}
             />
           </div>

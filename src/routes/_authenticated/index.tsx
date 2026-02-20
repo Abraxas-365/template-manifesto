@@ -51,7 +51,7 @@ function HomePage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total Policies"
+          label="Total Projects"
           value="--"
           icon={FileText}
           accent="bg-primary/10 text-primary"

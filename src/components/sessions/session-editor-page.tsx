@@ -400,7 +400,7 @@ export function SessionEditorPage() {
                       Start a conversation
                     </p>
                     <p className="text-muted-foreground/60 mt-1 max-w-48 text-xs">
-                      Ask the AI to help draft, edit, or review your policy document.
+                      Ask the AI to help draft, edit, or review your document.
                     </p>
                   </div>
                 )}
