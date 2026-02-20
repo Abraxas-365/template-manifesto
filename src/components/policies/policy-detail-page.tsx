@@ -12,6 +12,8 @@ import {
   Tag,
   FileText,
   Clock,
+  GitBranch,
+  Loader2,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -58,6 +60,7 @@ import {
   useRetirePolicy,
   useDeletePolicy,
 } from "@/domains/policies/hooks";
+import { useCreateSession } from "@/domains/sessions/hooks";
 import { PolicyStatusBadge } from "./policy-status-badge";
 import type {
   Classification,
@@ -70,11 +73,14 @@ export function PolicyDetailPage() {
   });
   const navigate = useNavigate();
   const { data: policy, isLoading } = usePolicy(policyId);
+  const { data: previousPolicy } = usePolicy(policy?.previous_policy_id ?? "");
   const updatePolicy = useUpdatePolicy();
   const submitForReview = useSubmitForReview();
   const approvePolicy = useApprovePolicy();
   const retirePolicy = useRetirePolicy();
   const deletePolicy = useDeletePolicy();
+
+  const createSession = useCreateSession();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -148,6 +154,30 @@ export function PolicyDetailPage() {
     try {
       await retirePolicy.mutateAsync({ path: { id: policy.id } });
       toast.success("Policy retired");
+    } catch {
+      // global error handler
+    }
+  };
+
+  const handleCreateNewVersion = async () => {
+    if (!policy) return;
+    try {
+      const session = await createSession.mutateAsync({
+        path: { projectId: policy.project_id },
+        body: {
+          name: `${policy.title} - New Version`,
+          document: {
+            title: policy.title,
+            content: policy.content,
+          },
+        },
+      });
+      toast.success("Session created from policy");
+      void navigate({
+        to: "/sessions/$sessionId",
+        params: { sessionId: session.id },
+        search: { fromPolicyId: policy.id },
+      });
     } catch {
       // global error handler
     }
@@ -299,15 +329,29 @@ export function PolicyDetailPage() {
             </Dialog>
           )}
           {isApproved && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRetire}
-              disabled={retirePolicy.isPending}
-            >
-              <XCircle className="size-4" />
-              Retire
-            </Button>
+            <>
+              <Button
+                size="sm"
+                onClick={handleCreateNewVersion}
+                disabled={createSession.isPending}
+              >
+                {createSession.isPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <GitBranch className="size-4" />
+                )}
+                {createSession.isPending ? "Creating..." : "Create New Version"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRetire}
+                disabled={retirePolicy.isPending}
+              >
+                <XCircle className="size-4" />
+                Retire
+              </Button>
+            </>
           )}
           {isDraft && !isEditing && (
             <Button
@@ -465,6 +509,21 @@ export function PolicyDetailPage() {
                   label="Approver"
                 >
                   <span className="text-sm">{metadata.approver}</span>
+                </MetadataRow>
+              )}
+
+              {previousPolicy && (
+                <MetadataRow
+                  icon={<GitBranch className="size-3.5" />}
+                  label="Previous Version"
+                >
+                  <Link
+                    to="/policies/$policyId"
+                    params={{ policyId: previousPolicy.id }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {previousPolicy.title} (v{previousPolicy.metadata.version})
+                  </Link>
                 </MetadataRow>
               )}
 

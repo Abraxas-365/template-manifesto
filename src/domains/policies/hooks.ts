@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/domains";
 
@@ -33,6 +34,15 @@ export function usePoliciesByProject(
     }),
     enabled: !!projectId,
   });
+}
+
+export function useApprovedPoliciesByProject(projectId: string) {
+  const query = usePoliciesByProject(projectId, 1, 100);
+  const approvedPolicies = useMemo(
+    () => query.data?.items?.filter((p) => p.metadata.status === "approved") ?? [],
+    [query.data],
+  );
+  return { ...query, data: approvedPolicies };
 }
 
 export function usePolicy(id: string) {

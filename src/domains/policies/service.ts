@@ -4,6 +4,7 @@ import type {
   PaginatedResponse,
   UpdatePolicyRequest,
   PublishPolicyRequest,
+  GenerateFromSessionRequest,
 } from "./types";
 
 export const policiesSchema = {
@@ -12,6 +13,7 @@ export const policiesSchema = {
     path: "/api/v1/editor/policies/generate/:sessionId",
     request: {
       path: t<{ sessionId: string }>(),
+      body: t<GenerateFromSessionRequest>(),
     },
     response: { ok: t<PolicyDTO>() },
   }),

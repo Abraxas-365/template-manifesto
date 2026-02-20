@@ -45,8 +45,13 @@ export interface PolicyDTO {
   title: string;
   content: string;
   metadata: PolicyMetadata;
+  previous_policy_id?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface GenerateFromSessionRequest {
+  previous_policy_id?: string;
 }
 
 export interface UpdatePolicyRequest {

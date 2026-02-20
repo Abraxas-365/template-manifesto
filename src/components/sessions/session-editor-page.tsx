@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
-import { useParams, Link, useNavigate } from "@tanstack/react-router";
+import { useParams, useSearch, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Send,
@@ -13,6 +13,7 @@ import {
   Circle,
   ShieldAlert,
   Save,
+  GitBranch,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -52,7 +53,7 @@ import {
   useSaveDocument,
   useStreamSession,
 } from "@/domains/sessions/hooks";
-import { useGeneratePolicy } from "@/domains/policies/hooks";
+import { useGeneratePolicy, usePolicy } from "@/domains/policies/hooks";
 import type { SSEEvent, MessageRecord } from "@/domains/sessions/types";
 
 const lowlight = createLowlight(common);
@@ -214,8 +215,12 @@ export function SessionEditorPage() {
   const { sessionId } = useParams({
     from: "/_authenticated/sessions/$sessionId",
   });
+  const { fromPolicyId } = useSearch({
+    from: "/_authenticated/sessions/$sessionId",
+  });
   const navigate = useNavigate();
   const { data: session, isLoading } = useSession(sessionId);
+  const { data: basePolicy } = usePolicy(fromPolicyId ?? "");
   const clearHistory = useClearHistory();
   const saveDocument = useSaveDocument();
   const generatePolicy = useGeneratePolicy();
@@ -282,8 +287,13 @@ export function SessionEditorPage() {
     try {
       const result = await generatePolicy.mutateAsync({
         path: { sessionId },
+        body: fromPolicyId ? { previous_policy_id: fromPolicyId } : {},
       });
-      toast.success("Policy generated");
+      toast.success(
+        fromPolicyId
+          ? "New policy version generated. The previous version will be auto-retired on approval."
+          : "Policy generated",
+      );
       void navigate({
         to: "/policies/$policyId",
         params: { policyId: result.id },
@@ -378,6 +388,13 @@ export function SessionEditorPage() {
         >
           {session.status}
         </Badge>
+
+        {fromPolicyId && basePolicy && (
+          <Badge variant="outline" className="shrink-0 gap-1">
+            <GitBranch className="size-3" />
+            Revising: {basePolicy.title} (v{basePolicy.metadata.version})
+          </Badge>
+        )}
 
         <Tooltip>
           <TooltipTrigger asChild>
