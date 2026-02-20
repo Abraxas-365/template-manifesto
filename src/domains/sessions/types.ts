@@ -59,6 +59,10 @@ export interface UpdateSessionRequest {
   name?: string;
 }
 
+export interface SaveDocumentRequest {
+  content: string;
+}
+
 export interface RunRequest {
   message: string;
 }

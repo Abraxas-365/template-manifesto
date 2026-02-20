@@ -4,6 +4,7 @@ import type {
   PaginatedResponse,
   CreateSessionRequest,
   UpdateSessionRequest,
+  SaveDocumentRequest,
   RunResponse,
 } from "./types";
 
@@ -79,6 +80,16 @@ export const sessionsSchema = {
     path: "/api/v1/editor/sessions/:id/history",
     request: {
       path: t<{ id: string }>(),
+    },
+    response: { ok: t<SessionDTO>() },
+  }),
+
+  saveDocument: endpoint({
+    method: "PUT",
+    path: "/api/v1/editor/sessions/:id/document",
+    request: {
+      path: t<{ id: string }>(),
+      body: t<SaveDocumentRequest>(),
     },
     response: { ok: t<SessionDTO>() },
   }),
