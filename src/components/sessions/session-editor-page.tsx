@@ -17,6 +17,9 @@ import remarkGfm from "remark-gfm";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import { Markdown } from "tiptap-markdown";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,29 +43,63 @@ import {
 } from "@/domains/sessions/hooks";
 import type { SSEEvent, MessageRecord } from "@/domains/sessions/types";
 
+const lowlight = createLowlight(common);
+
 function DocumentEditor({ content }: { content: string }) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false, // replaced by CodeBlockLowlight
+      }),
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
       Placeholder.configure({
-        placeholder: "Your document will appear here…",
+        placeholder: "Start writing or let the AI generate content…",
+      }),
+      Markdown.configure({
+        html: true,
+        transformPastedText: true,
+        transformCopiedText: true,
+        breaks: false,
       }),
     ],
     content: content || "",
-    editable: false,
+    editable: true,
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[200px] px-6 py-4",
+          "prose prose-neutral dark:prose-invert max-w-none focus:outline-none min-h-[300px] px-8 py-6 " +
+          // Heading styles
+          "prose-headings:font-display prose-headings:tracking-tight " +
+          "prose-h1:text-2xl prose-h1:font-bold prose-h1:border-b prose-h1:pb-2 prose-h1:mb-4 " +
+          "prose-h2:text-xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-3 " +
+          "prose-h3:text-lg prose-h3:font-semibold prose-h3:mt-6 " +
+          // Body
+          "prose-p:leading-7 prose-p:text-[15px] " +
+          // Lists
+          "prose-li:text-[15px] prose-li:leading-7 " +
+          "prose-ul:my-4 prose-ol:my-4 " +
+          // Code
+          "prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[13px] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none " +
+          "prose-pre:rounded-lg prose-pre:bg-[#1e1e2e] prose-pre:border prose-pre:border-border/50 prose-pre:shadow-sm " +
+          // Links
+          "prose-a:text-primary prose-a:underline-offset-4 prose-a:decoration-primary/30 hover:prose-a:decoration-primary " +
+          // Blockquotes
+          "prose-blockquote:border-l-primary/50 prose-blockquote:bg-muted/30 prose-blockquote:rounded-r-lg prose-blockquote:py-1 prose-blockquote:not-italic " +
+          // Strong
+          "prose-strong:font-semibold",
       },
     },
   });
 
-  // Sync content when session data updates
+  // Sync content when session data updates (e.g. after AI edit)
   useEffect(() => {
     if (editor && content !== undefined) {
-      const currentContent = editor.getHTML();
-      if (currentContent !== content) {
+      // Only update if content actually changed (avoid cursor jump)
+      const storage = editor.storage as Record<string, any>;
+      const currentMd = storage.markdown?.getMarkdown?.() ?? "";
+      if (currentMd.trim() !== content.trim()) {
         editor.commands.setContent(content || "");
       }
     }
@@ -71,19 +108,11 @@ function DocumentEditor({ content }: { content: string }) {
   return <EditorContent editor={editor} />;
 }
 
-function ChatMessage({
-  msg,
-  isLast,
-}: {
-  msg: MessageRecord;
-  isLast: boolean;
-}) {
+function ChatMessage({ msg }: { msg: MessageRecord }) {
   const isUser = msg.role === "user";
 
   return (
-    <div
-      className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""} ${isLast ? "" : ""}`}
-    >
+    <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
       {/* Avatar */}
       <div
         className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
@@ -106,7 +135,21 @@ function ChatMessage({
         {isUser ? (
           <p className="whitespace-pre-wrap">{msg.content}</p>
         ) : (
-          <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+          <div
+            className={
+              "prose prose-sm dark:prose-invert max-w-none " +
+              "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0 " +
+              "prose-p:leading-6 prose-p:my-1.5 " +
+              "prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-1.5 " +
+              "prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0 " +
+              "prose-code:rounded prose-code:bg-background/50 prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none " +
+              "prose-pre:rounded-lg prose-pre:bg-[#1e1e2e] prose-pre:text-[13px] prose-pre:my-2 " +
+              "prose-a:text-primary prose-a:underline-offset-2 " +
+              "prose-blockquote:border-l-primary/40 prose-blockquote:not-italic prose-blockquote:pl-3 prose-blockquote:my-2 " +
+              "prose-strong:font-semibold " +
+              "prose-hr:my-3"
+            }
+          >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {msg.content}
             </ReactMarkdown>
@@ -340,7 +383,6 @@ export function SessionEditorPage() {
                   <ChatMessage
                     key={`${msg.role}-${msg.created_at}-${i}`}
                     msg={msg}
-                    isLast={i === displayMessages.length - 1}
                   />
                 ))}
 
@@ -351,7 +393,15 @@ export function SessionEditorPage() {
                       <Bot className="size-4" />
                     </div>
                     <div className="bg-muted max-w-[85%] rounded-2xl rounded-bl-md px-4 py-2.5 text-sm leading-relaxed">
-                      <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                      <div
+                        className={
+                          "prose prose-sm dark:prose-invert max-w-none " +
+                          "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0 " +
+                          "prose-p:leading-6 prose-p:my-1.5 " +
+                          "prose-code:rounded prose-code:bg-background/50 prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none " +
+                          "prose-pre:rounded-lg prose-pre:bg-[#1e1e2e] prose-pre:text-[13px] prose-pre:my-2"
+                        }
+                      >
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {streamedText}
                         </ReactMarkdown>
