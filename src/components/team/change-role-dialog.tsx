@@ -79,14 +79,21 @@ export function ChangeRoleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Change Role</DialogTitle>
-          <DialogDescription>
-            Update the role for{" "}
-            <span className="font-medium">{user?.name || user?.email}</span>.
-          </DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+              <svg className="size-5 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+            </div>
+            <div>
+              <DialogTitle>Change Role</DialogTitle>
+              <DialogDescription>
+                Update the role for{" "}
+                <span className="font-medium">{user?.name || user?.email}</span>.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 pt-2">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="change-role-select">Role Template</Label>
             <Select value={template} onValueChange={setTemplate}>
               <SelectTrigger id="change-role-select">

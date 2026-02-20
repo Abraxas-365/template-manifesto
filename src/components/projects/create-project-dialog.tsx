@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, FolderPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -43,33 +45,43 @@ export function CreateProjectDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 size-4" />
-          New Project
+          <Plus className="size-4" />
+          New Policy
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create Project</DialogTitle>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+              <FolderPlus className="size-5 text-primary" />
+            </div>
+            <div>
+              <DialogTitle>Create Policy</DialogTitle>
+              <DialogDescription>
+                Set up a new policy project for your organization
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
+        <form onSubmit={onSubmit} className="flex flex-col gap-5 pt-2">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              placeholder="My project"
+              placeholder="e.g. Information Security Policy"
               {...form.register("name", { required: true })}
             />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="What is this project about?"
+              placeholder="Describe the scope and purpose of this policy..."
               {...form.register("description")}
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="system_prompt">System Prompt</Label>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="system_prompt">Custom Instructions</Label>
             <Textarea
               id="system_prompt"
               placeholder="Custom instructions for the AI editor..."
@@ -77,9 +89,21 @@ export function CreateProjectDialog() {
               {...form.register("system_prompt")}
             />
           </div>
-          <Button type="submit" disabled={createProject.isPending}>
-            {createProject.isPending ? "Creating..." : "Create"}
-          </Button>
+          <DialogFooter className="pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createProject.isPending}>
+              {createProject.isPending && (
+                <Loader2 className="size-4 animate-spin" />
+              )}
+              {createProject.isPending ? "Creating..." : "Create Policy"}
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

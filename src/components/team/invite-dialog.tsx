@@ -87,13 +87,20 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Invite Member</DialogTitle>
-          <DialogDescription>
-            Send an invitation to join your team.
-          </DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+              <svg className="size-5 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+            </div>
+            <div>
+              <DialogTitle>Invite Member</DialogTitle>
+              <DialogDescription>
+                Send an invitation to join your team.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 pt-2">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="invite-email">Email</Label>
             <Input
               id="invite-email"
@@ -109,7 +116,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
               <p className="text-sm text-destructive">{emailError}</p>
             )}
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="invite-role">Role</Label>
             <Select value={template} onValueChange={setTemplate}>
               <SelectTrigger id="invite-role">

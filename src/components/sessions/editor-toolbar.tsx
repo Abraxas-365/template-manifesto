@@ -222,7 +222,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-0.5 overflow-x-auto border-b bg-muted/30 px-2 py-1.5",
+        "flex items-center gap-0.5 overflow-x-auto border-b border-border/60 bg-white px-3 py-2",
       )}
     >
       {/* History */}

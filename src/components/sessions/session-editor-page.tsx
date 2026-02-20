@@ -114,7 +114,7 @@ function DocumentEditor({ content }: { content: string }) {
   }, [editor, content]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-white">
       <EditorToolbar editor={editor} />
       <div className="min-h-0 flex-1 overflow-y-auto">
         <EditorContent editor={editor} />
@@ -130,21 +130,21 @@ function ChatMessage({ msg }: { msg: MessageRecord }) {
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
       {/* Avatar */}
       <div
-        className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
+        className={`flex size-7 shrink-0 items-center justify-center rounded-lg ${
           isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-muted-foreground"
+            ? "bg-primary/10 text-primary"
+            : "bg-slate-100 text-slate-500"
         }`}
       >
-        {isUser ? <User className="size-4" /> : <Bot className="size-4" />}
+        {isUser ? <User className="size-3.5" /> : <Bot className="size-3.5" />}
       </div>
 
       {/* Message bubble */}
       <div
         className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
           isUser
-            ? "bg-primary text-primary-foreground rounded-br-md"
-            : "bg-muted rounded-bl-md"
+            ? "bg-primary text-primary-foreground rounded-tr-md shadow-sm"
+            : "rounded-tl-md border border-border/40 bg-white shadow-sm"
         }`}
       >
         {isUser ? (
@@ -157,8 +157,8 @@ function ChatMessage({ msg }: { msg: MessageRecord }) {
               "prose-p:leading-6 prose-p:my-1.5 " +
               "prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-1.5 " +
               "prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0 " +
-              "prose-code:rounded prose-code:bg-background/50 prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none " +
-              "prose-pre:rounded-lg prose-pre:bg-[#1e1e2e] prose-pre:text-[13px] prose-pre:my-2 " +
+              "prose-code:rounded-md prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none " +
+              "prose-pre:rounded-xl prose-pre:bg-[#1e1e2e] prose-pre:text-[13px] prose-pre:my-2 " +
               "prose-a:text-primary prose-a:underline-offset-2 " +
               "prose-blockquote:border-l-primary/40 prose-blockquote:not-italic prose-blockquote:pl-3 prose-blockquote:my-2 " +
               "prose-strong:font-semibold " +
@@ -179,14 +179,14 @@ function ToolEventBadge({ event }: { event: SSEEvent }) {
   const isDone = event.type === "tool_result";
 
   return (
-    <div className="flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-xs">
+    <div className="flex items-center gap-1.5 rounded-lg border border-border/40 bg-white px-2.5 py-1 text-xs shadow-sm">
       {isDone ? (
-        <CheckCircle2 className="text-pa-success size-3" />
+        <CheckCircle2 className="size-3 text-emerald-500" />
       ) : (
         <Circle className="text-muted-foreground size-3 animate-pulse" />
       )}
       <Wrench className="text-muted-foreground size-3" />
-      <span className="font-mono text-[11px]">{event.tool_name}</span>
+      <span className="font-mono text-[11px] text-muted-foreground">{event.tool_name}</span>
     </div>
   );
 }
@@ -321,7 +321,7 @@ export function SessionEditorPage() {
         </div>
 
         <Badge
-          variant={session.status === "active" ? "default" : "secondary"}
+          variant={session.status === "active" ? "success" : "secondary"}
           className="shrink-0"
         >
           {session.status}
@@ -344,12 +344,14 @@ export function SessionEditorPage() {
       </div>
 
       {/* Main layout */}
-      <ResizablePanelGroup className="flex-1 overflow-hidden rounded-xl border shadow-sm">
+      <ResizablePanelGroup className="flex-1 overflow-hidden rounded-xl border border-border/60 bg-white shadow-sm">
         {/* Document panel */}
         <ResizablePanel defaultSize={50} minSize={25}>
           <div className="flex h-full flex-col">
-            <div className="flex items-center gap-2 border-b px-4 py-2.5">
-              <FileText className="text-muted-foreground size-4" />
+            <div className="flex items-center gap-2 border-b border-border/60 bg-white px-4 py-2.5">
+              <div className="flex size-6 items-center justify-center rounded-md bg-primary/10">
+                <FileText className="size-3.5 text-primary" />
+              </div>
               <h3 className="text-sm font-medium">Document</h3>
               {session.document.versions &&
                 session.document.versions.length > 0 && (
@@ -368,17 +370,21 @@ export function SessionEditorPage() {
 
         {/* Chat panel */}
         <ResizablePanel defaultSize={50} minSize={25}>
-          <div className="flex h-full flex-col bg-background">
-            <div className="flex items-center gap-2 border-b px-4 py-2.5">
-              <Bot className="text-muted-foreground size-4" />
-              <h3 className="text-sm font-medium">Chat</h3>
+          <div className="flex h-full flex-col"
+            style={{ background: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)" }}
+          >
+            <div className="flex items-center gap-2 border-b border-border/60 bg-white px-4 py-2.5">
+              <div className="flex size-6 items-center justify-center rounded-md bg-indigo-500/10">
+                <Bot className="size-3.5 text-indigo-500" />
+              </div>
+              <h3 className="text-sm font-medium">AI Assistant</h3>
               {isStreaming && (
-                <Badge
-                  variant="outline"
-                  className="ml-auto animate-pulse text-[10px]"
-                >
-                  streaming
-                </Badge>
+                <div className="ml-auto flex items-center gap-1.5">
+                  <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  <span className="text-[10px] font-medium text-emerald-600">
+                    Streaming
+                  </span>
+                </div>
               )}
             </div>
 
@@ -386,10 +392,15 @@ export function SessionEditorPage() {
             <div className="min-h-0 flex-1 overflow-y-auto">
               <div className="flex flex-col gap-4 p-4">
                 {displayMessages.length === 0 && !isStreaming && (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <Bot className="text-muted-foreground/50 mb-3 size-10" />
-                    <p className="text-muted-foreground text-sm">
-                      Send a message to start editing your document.
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="flex size-14 items-center justify-center rounded-2xl bg-white shadow-sm border border-border/40">
+                      <Bot className="text-muted-foreground/60 size-7" />
+                    </div>
+                    <p className="text-muted-foreground mt-4 text-sm font-medium">
+                      Start a conversation
+                    </p>
+                    <p className="text-muted-foreground/60 mt-1 max-w-48 text-xs">
+                      Ask the AI to help draft, edit, or review your policy document.
                     </p>
                   </div>
                 )}
@@ -404,17 +415,17 @@ export function SessionEditorPage() {
                 {/* Streaming assistant response */}
                 {isStreaming && streamedText && (
                   <div className="flex gap-3">
-                    <div className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-full">
-                      <Bot className="size-4" />
+                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+                      <Bot className="size-3.5" />
                     </div>
-                    <div className="bg-muted max-w-[85%] rounded-2xl rounded-bl-md px-4 py-2.5 text-sm leading-relaxed">
+                    <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-border/40 bg-white px-4 py-2.5 text-sm leading-relaxed shadow-sm">
                       <div
                         className={
                           "prose prose-sm dark:prose-invert max-w-none " +
                           "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0 " +
                           "prose-p:leading-6 prose-p:my-1.5 " +
-                          "prose-code:rounded prose-code:bg-background/50 prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none " +
-                          "prose-pre:rounded-lg prose-pre:bg-[#1e1e2e] prose-pre:text-[13px] prose-pre:my-2"
+                          "prose-code:rounded-md prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none " +
+                          "prose-pre:rounded-xl prose-pre:bg-[#1e1e2e] prose-pre:text-[13px] prose-pre:my-2"
                         }
                       >
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -427,7 +438,7 @@ export function SessionEditorPage() {
 
                 {/* Tool events as compact pills */}
                 {toolEvents.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pl-11">
+                  <div className="flex flex-wrap gap-1.5 pl-10">
                     {toolEvents.map((ev, i) => (
                       <ToolEventBadge key={i} event={ev} />
                     ))}
@@ -437,14 +448,14 @@ export function SessionEditorPage() {
                 {/* Thinking indicator */}
                 {isStreaming && !streamedText && (
                   <div className="flex items-center gap-3">
-                    <div className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-full">
-                      <Bot className="size-4" />
+                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+                      <Bot className="size-3.5" />
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 rounded-xl border border-border/40 bg-white px-3 py-2 shadow-sm">
                       <div className="flex gap-1">
-                        <span className="bg-muted-foreground/50 size-1.5 animate-bounce rounded-full [animation-delay:0ms]" />
-                        <span className="bg-muted-foreground/50 size-1.5 animate-bounce rounded-full [animation-delay:150ms]" />
-                        <span className="bg-muted-foreground/50 size-1.5 animate-bounce rounded-full [animation-delay:300ms]" />
+                        <span className="size-1.5 animate-bounce rounded-full bg-primary/50 [animation-delay:0ms]" />
+                        <span className="size-1.5 animate-bounce rounded-full bg-primary/50 [animation-delay:150ms]" />
+                        <span className="size-1.5 animate-bounce rounded-full bg-primary/50 [animation-delay:300ms]" />
                       </div>
                       <span className="text-muted-foreground text-xs">
                         Thinking...
@@ -458,7 +469,7 @@ export function SessionEditorPage() {
             </div>
 
             {/* Input area */}
-            <div className="border-t p-3">
+            <div className="border-t border-border/60 bg-white p-3">
               <div className="flex items-end gap-2">
                 <Textarea
                   value={input}
@@ -470,7 +481,7 @@ export function SessionEditorPage() {
                       : "Ask the AI to edit your document..."
                   }
                   rows={1}
-                  className="max-h-32 min-h-[44px] resize-none rounded-xl"
+                  className="max-h-32 min-h-[44px] resize-none rounded-xl border-border/60 bg-slate-50 shadow-none focus-visible:bg-white"
                   disabled={isStreaming || session.status !== "active"}
                 />
                 {isStreaming ? (
@@ -496,7 +507,7 @@ export function SessionEditorPage() {
                         disabled={
                           !input.trim() || session.status !== "active"
                         }
-                        className="size-10 shrink-0 rounded-xl"
+                        className="size-10 shrink-0 rounded-xl shadow-sm"
                       >
                         <Send className="size-4" />
                       </Button>
