@@ -17,9 +17,9 @@ import remarkGfm from "remark-gfm";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Markdown } from "tiptap-markdown";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
+import { marked } from "marked";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +44,16 @@ import type { SSEEvent, MessageRecord } from "@/domains/sessions/types";
 
 const lowlight = createLowlight(common);
 
+// Convert markdown to HTML using `marked` — tiptap-markdown's setContent()
+// override is broken with Tiptap v3, so we do the conversion ourselves.
+function markdownToHtml(md: string): string {
+  if (!md) return "";
+  return marked.parse(md, { async: false, gfm: true, breaks: false }) as string;
+}
+
 function DocumentEditor({ content }: { content: string }) {
+  const htmlContent = useMemo(() => markdownToHtml(content), [content]);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -56,15 +65,8 @@ function DocumentEditor({ content }: { content: string }) {
       Placeholder.configure({
         placeholder: "Start writing or let the AI generate content…",
       }),
-      Markdown.configure({
-        html: true,
-        transformPastedText: true,
-        transformCopiedText: true,
-        breaks: false,
-      }),
     ],
-    // Initialize empty — content is set via setContent() so tiptap-markdown parses it
-    content: "",
+    content: htmlContent,
     editable: true,
     editorProps: {
       attributes: {
@@ -93,14 +95,13 @@ function DocumentEditor({ content }: { content: string }) {
     },
   });
 
-  // Set content via setContent() so tiptap-markdown parses markdown→HTML properly.
-  // The initial `content` prop in useEditor is treated as HTML, not markdown.
+  // Sync when backend content updates (e.g. after AI edits the document)
   useEffect(() => {
     if (editor && content !== undefined) {
-      const storage = editor.storage as Record<string, any>;
-      const currentMd = storage.markdown?.getMarkdown?.() ?? "";
-      if (currentMd.trim() !== content.trim()) {
-        editor.commands.setContent(content || "");
+      const newHtml = markdownToHtml(content);
+      const currentHtml = editor.getHTML();
+      if (currentHtml !== newHtml) {
+        editor.commands.setContent(newHtml);
       }
     }
   }, [editor, content]);
