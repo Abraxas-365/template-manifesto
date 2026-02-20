@@ -13,10 +13,12 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
+import { Route as AuthenticatedPoliciesIndexRouteImport } from './routes/_authenticated/policies/index'
 import { Route as AuthenticatedKbsIndexRouteImport } from './routes/_authenticated/kbs/index'
 import { Route as AuthenticatedSessionsSessionIdRouteImport } from './routes/_authenticated/sessions/$sessionId'
 import { Route as AuthenticatedProjectsNewRouteImport } from './routes/_authenticated/projects/new'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects/$projectId'
+import { Route as AuthenticatedPoliciesPolicyIdRouteImport } from './routes/_authenticated/policies/$policyId'
 import { Route as AuthenticatedProjectsProjectIdSettingsRouteImport } from './routes/_authenticated/projects/$projectId_.settings'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -37,6 +39,12 @@ const AuthenticatedProjectsIndexRoute =
   AuthenticatedProjectsIndexRouteImport.update({
     id: '/projects/',
     path: '/projects/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPoliciesIndexRoute =
+  AuthenticatedPoliciesIndexRouteImport.update({
+    id: '/policies/',
+    path: '/policies/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedKbsIndexRoute = AuthenticatedKbsIndexRouteImport.update({
@@ -62,6 +70,12 @@ const AuthenticatedProjectsProjectIdRoute =
     path: '/projects/$projectId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPoliciesPolicyIdRoute =
+  AuthenticatedPoliciesPolicyIdRouteImport.update({
+    id: '/policies/$policyId',
+    path: '/policies/$policyId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProjectsProjectIdSettingsRoute =
   AuthenticatedProjectsProjectIdSettingsRouteImport.update({
     id: '/projects/$projectId_/settings',
@@ -72,20 +86,24 @@ const AuthenticatedProjectsProjectIdSettingsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth/': typeof AuthIndexRoute
+  '/policies/$policyId': typeof AuthenticatedPoliciesPolicyIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/projects/new': typeof AuthenticatedProjectsNewRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
   '/kbs/': typeof AuthenticatedKbsIndexRoute
+  '/policies/': typeof AuthenticatedPoliciesIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/projects/$projectId/settings': typeof AuthenticatedProjectsProjectIdSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthIndexRoute
+  '/policies/$policyId': typeof AuthenticatedPoliciesPolicyIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/projects/new': typeof AuthenticatedProjectsNewRoute
   '/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
   '/kbs': typeof AuthenticatedKbsIndexRoute
+  '/policies': typeof AuthenticatedPoliciesIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
   '/projects/$projectId/settings': typeof AuthenticatedProjectsProjectIdSettingsRoute
 }
@@ -94,10 +112,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/auth/': typeof AuthIndexRoute
+  '/_authenticated/policies/$policyId': typeof AuthenticatedPoliciesPolicyIdRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/_authenticated/projects/new': typeof AuthenticatedProjectsNewRoute
   '/_authenticated/sessions/$sessionId': typeof AuthenticatedSessionsSessionIdRoute
   '/_authenticated/kbs/': typeof AuthenticatedKbsIndexRoute
+  '/_authenticated/policies/': typeof AuthenticatedPoliciesIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
   '/_authenticated/projects/$projectId_/settings': typeof AuthenticatedProjectsProjectIdSettingsRoute
 }
@@ -106,20 +126,24 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth/'
+    | '/policies/$policyId'
     | '/projects/$projectId'
     | '/projects/new'
     | '/sessions/$sessionId'
     | '/kbs/'
+    | '/policies/'
     | '/projects/'
     | '/projects/$projectId/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/policies/$policyId'
     | '/projects/$projectId'
     | '/projects/new'
     | '/sessions/$sessionId'
     | '/kbs'
+    | '/policies'
     | '/projects'
     | '/projects/$projectId/settings'
   id:
@@ -127,10 +151,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_authenticated/'
     | '/auth/'
+    | '/_authenticated/policies/$policyId'
     | '/_authenticated/projects/$projectId'
     | '/_authenticated/projects/new'
     | '/_authenticated/sessions/$sessionId'
     | '/_authenticated/kbs/'
+    | '/_authenticated/policies/'
     | '/_authenticated/projects/'
     | '/_authenticated/projects/$projectId_/settings'
   fileRoutesById: FileRoutesById
@@ -170,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/policies/': {
+      id: '/_authenticated/policies/'
+      path: '/policies'
+      fullPath: '/policies/'
+      preLoaderRoute: typeof AuthenticatedPoliciesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/kbs/': {
       id: '/_authenticated/kbs/'
       path: '/kbs'
@@ -198,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsProjectIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/policies/$policyId': {
+      id: '/_authenticated/policies/$policyId'
+      path: '/policies/$policyId'
+      fullPath: '/policies/$policyId'
+      preLoaderRoute: typeof AuthenticatedPoliciesPolicyIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/projects/$projectId_/settings': {
       id: '/_authenticated/projects/$projectId_/settings'
       path: '/projects/$projectId/settings'
@@ -210,20 +250,24 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedPoliciesPolicyIdRoute: typeof AuthenticatedPoliciesPolicyIdRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedProjectsNewRoute: typeof AuthenticatedProjectsNewRoute
   AuthenticatedSessionsSessionIdRoute: typeof AuthenticatedSessionsSessionIdRoute
   AuthenticatedKbsIndexRoute: typeof AuthenticatedKbsIndexRoute
+  AuthenticatedPoliciesIndexRoute: typeof AuthenticatedPoliciesIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
   AuthenticatedProjectsProjectIdSettingsRoute: typeof AuthenticatedProjectsProjectIdSettingsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedPoliciesPolicyIdRoute: AuthenticatedPoliciesPolicyIdRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedProjectsNewRoute: AuthenticatedProjectsNewRoute,
   AuthenticatedSessionsSessionIdRoute: AuthenticatedSessionsSessionIdRoute,
   AuthenticatedKbsIndexRoute: AuthenticatedKbsIndexRoute,
+  AuthenticatedPoliciesIndexRoute: AuthenticatedPoliciesIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
   AuthenticatedProjectsProjectIdSettingsRoute:
     AuthenticatedProjectsProjectIdSettingsRoute,

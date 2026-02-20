@@ -4,6 +4,7 @@ import {
   FileText,
   FileStack,
   ShieldCheck,
+  ShieldAlert,
   Users,
   Settings,
 } from "lucide-react";
@@ -47,6 +48,11 @@ export const navConfig: NavGroup[] = [
         label: "Knowledge Base",
         to: "/kbs",
         icon: FileStack,
+      },
+      {
+        label: "Policies",
+        to: "/policies",
+        icon: ShieldAlert,
       },
       {
         label: "Controls",

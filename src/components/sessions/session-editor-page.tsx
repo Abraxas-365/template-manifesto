@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { useParams, Link } from "@tanstack/react-router";
+import { useParams, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Send,
@@ -11,6 +11,7 @@ import {
   FileText,
   CheckCircle2,
   Circle,
+  ShieldAlert,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -48,6 +49,7 @@ import {
   useClearHistory,
   useStreamSession,
 } from "@/domains/sessions/hooks";
+import { useGeneratePolicy } from "@/domains/policies/hooks";
 import type { SSEEvent, MessageRecord } from "@/domains/sessions/types";
 
 const lowlight = createLowlight(common);
@@ -195,8 +197,10 @@ export function SessionEditorPage() {
   const { sessionId } = useParams({
     from: "/_authenticated/sessions/$sessionId",
   });
+  const navigate = useNavigate();
   const { data: session, isLoading } = useSession(sessionId);
   const clearHistory = useClearHistory();
+  const generatePolicy = useGeneratePolicy();
   const { stream, abort, isStreaming, streamedText } =
     useStreamSession(sessionId);
 
@@ -252,6 +256,21 @@ export function SessionEditorPage() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleGeneratePolicy = async () => {
+    try {
+      const result = await generatePolicy.mutateAsync({
+        path: { sessionId },
+      });
+      toast.success("Policy generated");
+      void navigate({
+        to: "/policies/$policyId",
+        params: { policyId: result.id },
+      });
+    } catch {
+      // global error handler
     }
   };
 
@@ -326,6 +345,21 @@ export function SessionEditorPage() {
         >
           {session.status}
         </Badge>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGeneratePolicy}
+              disabled={generatePolicy.isPending || session.status !== "active"}
+            >
+              <ShieldAlert className="size-4" />
+              {generatePolicy.isPending ? "Generating..." : "Generate Policy"}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Generate ISO 27001 policy from this session</TooltipContent>
+        </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>
