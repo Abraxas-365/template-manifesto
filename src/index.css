@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @theme inline {
   --radius-sm: 0.25rem;
@@ -168,10 +169,6 @@
     font-family: var(--font-sans);
     color: var(--muted-foreground);
   }
-  .prose {
-    max-width: 65ch;
-  }
-
   /* ── TipTap Editor base ── */
   .tiptap {
     min-height: 200px;
