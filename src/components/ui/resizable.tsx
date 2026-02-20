@@ -45,8 +45,8 @@ function ResizableHandle({
       {...props}
     >
       {withHandle && (
-        <div className="bg-border z-10 flex h-4 w-3 items-center justify-center rounded-xs border">
-          <GripVerticalIcon className="size-2.5" />
+        <div className="bg-muted z-10 flex h-7 w-3.5 items-center justify-center rounded-md border border-border/60 shadow-sm transition-colors hover:bg-secondary">
+          <GripVerticalIcon className="size-2.5 text-muted-foreground" />
         </div>
       )}
     </ResizablePrimitive.Separator>
