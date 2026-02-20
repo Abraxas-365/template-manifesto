@@ -46,7 +46,7 @@ export function CreateProjectDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus className="size-4" />
-          New Policy
+          New Project
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
@@ -56,9 +56,9 @@ export function CreateProjectDialog() {
               <FolderPlus className="size-5 text-primary" />
             </div>
             <div>
-              <DialogTitle>Create Policy</DialogTitle>
+              <DialogTitle>Create Project</DialogTitle>
               <DialogDescription>
-                Set up a new policy project for your organization
+                Set up a new project for your organization
               </DialogDescription>
             </div>
           </div>
@@ -68,7 +68,7 @@ export function CreateProjectDialog() {
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              placeholder="e.g. Information Security Policy"
+              placeholder="e.g. ISO 27001 Compliance Project"
               {...form.register("name", { required: true })}
             />
           </div>
@@ -76,7 +76,7 @@ export function CreateProjectDialog() {
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Describe the scope and purpose of this policy..."
+              placeholder="Describe the scope and purpose of this project..."
               {...form.register("description")}
             />
           </div>
@@ -101,7 +101,7 @@ export function CreateProjectDialog() {
               {createProject.isPending && (
                 <Loader2 className="size-4 animate-spin" />
               )}
-              {createProject.isPending ? "Creating..." : "Create Policy"}
+              {createProject.isPending ? "Creating..." : "Create Project"}
             </Button>
           </DialogFooter>
         </form>

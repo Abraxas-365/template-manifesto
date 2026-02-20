@@ -257,13 +257,13 @@ function LoginPage() {
               ISO 27001 Compliance
             </div>
             <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-white">
-              Policy Management,{" "}
+              Document Management,{" "}
               <span className="bg-gradient-to-r from-[#f4a292] to-[#dc6b56] bg-clip-text text-transparent">
                 Simplified
               </span>
             </h2>
             <p className="mt-4 text-base leading-relaxed text-slate-400">
-              Create, manage, and maintain your information security policies
+              Create, manage, and maintain your ISO compliance documents
               with intelligent templates and collaborative workflows.
             </p>
             <div className="mt-10 space-y-3">
@@ -273,7 +273,7 @@ function LoginPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-white">Smart Templates</p>
-                  <p className="text-xs text-slate-400">Pre-built ISO 27001 policy frameworks</p>
+                  <p className="text-xs text-slate-400">Pre-built ISO 27001 document frameworks</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm transition-colors hover:bg-white/10">

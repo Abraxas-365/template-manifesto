@@ -32,19 +32,19 @@ export const navConfig: NavGroup[] = [
     items: [{ label: "Dashboard", to: "/", icon: LayoutDashboard }],
   },
   {
-    label: "Policies",
+    label: "Projects",
     items: [
       {
-        label: "Policies",
+        label: "Projects",
         to: "/projects",
         icon: FileText,
         children: [
-          { label: "All Policies", to: "/projects" },
-          { label: "My Policies", to: "/projects/mine" },
+          { label: "All Projects", to: "/projects" },
+          { label: "My Projects", to: "/projects/mine" },
         ],
       },
       {
-        label: "Policy Templates",
+        label: "Templates",
         to: "/kbs",
         icon: FileStack,
       },
