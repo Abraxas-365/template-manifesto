@@ -184,12 +184,14 @@ function LoginPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       {/* Left: Auth Form */}
-      <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex items-center gap-2 md:justify-start">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">M</span>
+      <div className="flex flex-col gap-4 bg-white p-6 md:p-10">
+        <div className="flex items-center gap-2.5 md:justify-start">
+          <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#b84f3c] shadow-md shadow-primary/25">
+            <span className="text-sm font-bold text-white">M</span>
           </div>
-          <span className="text-lg font-bold tracking-tight">metrica</span>
+          <span className="font-display text-xl font-bold tracking-tight text-foreground">
+            metrica
+          </span>
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-sm">
@@ -237,28 +239,60 @@ function LoginPage() {
         </div>
       </div>
       {/* Right: Branded Panel */}
-      <div className="bg-primary relative hidden lg:block">
-        <div className="flex h-full flex-col items-center justify-center p-10">
-          <div className="max-w-md text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-primary-foreground">
-              Policies Management
+      <div className="relative hidden overflow-hidden lg:block"
+        style={{ background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)" }}
+      >
+        {/* Decorative gradient orbs */}
+        <div className="absolute -right-20 -top-20 size-80 rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle, #dc6b56 0%, transparent 70%)" }}
+        />
+        <div className="absolute -bottom-32 -left-20 size-96 rounded-full opacity-15"
+          style={{ background: "radial-gradient(circle, #f4a292 0%, transparent 70%)" }}
+        />
+
+        <div className="relative flex h-full flex-col items-center justify-center p-12">
+          <div className="max-w-md">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white/70 backdrop-blur-sm">
+              <ShieldCheck className="size-4 text-primary" />
+              ISO 27001 Compliance
+            </div>
+            <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-white">
+              Policy Management,{" "}
+              <span className="bg-gradient-to-r from-[#f4a292] to-[#dc6b56] bg-clip-text text-transparent">
+                Simplified
+              </span>
             </h2>
-            <p className="text-primary-foreground/80 mt-3 text-base leading-relaxed">
-              Create, manage, and maintain your ISO 27001 compliance policies
+            <p className="mt-4 text-base leading-relaxed text-slate-400">
+              Create, manage, and maintain your information security policies
               with intelligent templates and collaborative workflows.
             </p>
-            <div className="mt-8 grid gap-4">
-              <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3 text-left text-primary-foreground">
-                <ShieldCheck className="size-5 shrink-0" />
-                <span className="text-sm">ISO 27001 compliant policy templates</span>
+            <div className="mt-10 space-y-3">
+              <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm transition-colors hover:bg-white/10">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/20">
+                  <FileText className="size-5 text-[#f4a292]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">Smart Templates</p>
+                  <p className="text-xs text-slate-400">Pre-built ISO 27001 policy frameworks</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3 text-left text-primary-foreground">
-                <FileText className="size-5 shrink-0" />
-                <span className="text-sm">Automated document generation</span>
+              <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm transition-colors hover:bg-white/10">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20">
+                  <Lock className="size-5 text-indigo-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">Access Controls</p>
+                  <p className="text-xs text-slate-400">Role-based permissions and audit trails</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3 text-left text-primary-foreground">
-                <Lock className="size-5 shrink-0" />
-                <span className="text-sm">Access controls and audit trails</span>
+              <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm transition-colors hover:bg-white/10">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20">
+                  <ShieldCheck className="size-5 text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">Compliance Ready</p>
+                  <p className="text-xs text-slate-400">Automated gap analysis and reporting</p>
+                </div>
               </div>
             </div>
           </div>

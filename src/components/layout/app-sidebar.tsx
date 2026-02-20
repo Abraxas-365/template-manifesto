@@ -28,11 +28,14 @@ function SidebarBrandHeader() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Link to="/" className="flex items-center gap-2 p-2">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">M</span>
+        <Link to="/" className="flex items-center gap-2.5 p-2">
+          <div
+            className="flex size-8 items-center justify-center rounded-lg shadow-sm"
+            style={{ background: "linear-gradient(135deg, #dc6b56 0%, #b84f3c 100%)" }}
+          >
+            <span className="text-sm font-bold text-white">M</span>
           </div>
-          <span className="text-lg font-bold tracking-tight group-data-[collapsible=icon]:hidden">
+          <span className="font-display text-lg font-bold tracking-tight text-sidebar-foreground group-data-[collapsible=icon]:hidden">
             metrica
           </span>
         </Link>
