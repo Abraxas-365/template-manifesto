@@ -28,19 +28,13 @@ function SidebarBrandHeader() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Link to="/" className="flex items-center justify-center p-2">
-          {/*
-         add branding here
-          <img
-            src={practicalActionLogo}
-            alt="Practical Action"
-            className="h-10 w-auto group-data-[collapsible=icon]:hidden"
-          />
-          <img
-            src={practicalActionIcon}
-            alt="Practical Action"
-            className="hidden size-8 group-data-[collapsible=icon]:block"
-          /> */}
+        <Link to="/" className="flex items-center gap-2 p-2">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
+            <span className="text-sm font-bold text-primary-foreground">M</span>
+          </div>
+          <span className="text-lg font-bold tracking-tight group-data-[collapsible=icon]:hidden">
+            metrica
+          </span>
         </Link>
       </SidebarMenuItem>
     </SidebarMenu>

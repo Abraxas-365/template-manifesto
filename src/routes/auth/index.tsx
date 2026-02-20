@@ -3,7 +3,7 @@ import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, ArrowLeft, Mail } from "lucide-react";
+import { Loader2, ArrowLeft, Mail, ShieldCheck, FileText, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -185,8 +185,11 @@ function LoginPage() {
     <div className="grid min-h-svh lg:grid-cols-2">
       {/* Left: Auth Form */}
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center gap-2 md:justify-start">
-          <span className="text-lg font-semibold">Outcome Harvesting</span>
+        <div className="flex items-center gap-2 md:justify-start">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
+            <span className="text-sm font-bold text-primary-foreground">M</span>
+          </div>
+          <span className="text-lg font-bold tracking-tight">metrica</span>
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-sm">
@@ -234,16 +237,30 @@ function LoginPage() {
         </div>
       </div>
       {/* Right: Branded Panel */}
-      <div className="bg-muted relative hidden lg:block">
+      <div className="bg-primary relative hidden lg:block">
         <div className="flex h-full flex-col items-center justify-center p-10">
           <div className="max-w-md text-center">
-            <h2 className="text-2xl font-bold tracking-tight">
-              AI-Powered Outcome Harvesting
+            <h2 className="text-3xl font-bold tracking-tight text-primary-foreground">
+              Policies Management
             </h2>
-            <p className="text-muted-foreground mt-2">
-              Streamline your outcome harvesting process with intelligent
-              analysis and collaborative project management.
+            <p className="text-primary-foreground/80 mt-3 text-base leading-relaxed">
+              Create, manage, and maintain your ISO 27001 compliance policies
+              with intelligent templates and collaborative workflows.
             </p>
+            <div className="mt-8 grid gap-4">
+              <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3 text-left text-primary-foreground">
+                <ShieldCheck className="size-5 shrink-0" />
+                <span className="text-sm">ISO 27001 compliant policy templates</span>
+              </div>
+              <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3 text-left text-primary-foreground">
+                <FileText className="size-5 shrink-0" />
+                <span className="text-sm">Automated document generation</span>
+              </div>
+              <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3 text-left text-primary-foreground">
+                <Lock className="size-5 shrink-0" />
+                <span className="text-sm">Access controls and audit trails</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

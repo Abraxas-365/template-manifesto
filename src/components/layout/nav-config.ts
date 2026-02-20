@@ -1,11 +1,11 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Home,
-  FolderKanban,
-  BarChart3,
+  LayoutDashboard,
+  FileText,
+  FileStack,
+  ShieldCheck,
   Users,
   Settings,
-  BookOpen,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -29,30 +29,31 @@ export interface NavGroup {
 export const navConfig: NavGroup[] = [
   {
     label: "Overview",
-    items: [{ label: "Home", to: "/", icon: Home }],
+    items: [{ label: "Dashboard", to: "/", icon: LayoutDashboard }],
   },
   {
-    label: "Harvesting",
+    label: "Policies",
     items: [
       {
-        label: "Projects",
+        label: "Policies",
         to: "/projects",
-        icon: FolderKanban,
+        icon: FileText,
         children: [
-          { label: "All Projects", to: "/projects" },
-          { label: "My Projects", to: "/projects/mine" },
+          { label: "All Policies", to: "/projects" },
+          { label: "My Policies", to: "/projects/mine" },
         ],
       },
       {
-        label: "Knowledge Bases",
+        label: "Policy Templates",
         to: "/kbs",
-        icon: BookOpen,
+        icon: FileStack,
+      },
+      {
+        label: "Controls",
+        to: "/reports",
+        icon: ShieldCheck,
       },
     ],
-  },
-  {
-    label: "Analytics",
-    items: [{ label: "Reports", to: "/reports", icon: BarChart3 }],
   },
   {
     label: "Administration",

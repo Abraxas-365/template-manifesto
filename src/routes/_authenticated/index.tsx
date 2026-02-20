@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
-  staticData: { breadcrumb: "Home" },
+  staticData: { breadcrumb: "Dashboard" },
 });
 
 function HomePage() {
