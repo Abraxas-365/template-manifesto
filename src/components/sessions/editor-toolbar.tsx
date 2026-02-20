@@ -66,7 +66,7 @@ function ToolbarButton({
           pressed={pressed}
           onPressedChange={onPressedChange}
           disabled={disabled}
-          className="size-8 p-0"
+          className="size-8 shrink-0 p-0"
         >
           {children}
         </Toggle>
@@ -115,7 +115,7 @@ function LinkPopover({ editor }: { editor: Editor }) {
                   setOpen(true);
                 }
               }}
-              className="size-8 p-0"
+              className="size-8 shrink-0 p-0"
             >
               {editor.isActive("link") ? (
                 <Unlink className="size-4" />
@@ -178,7 +178,7 @@ function ImagePopover({ editor }: { editor: Editor }) {
               size="sm"
               pressed={false}
               onPressedChange={() => setOpen(true)}
-              className="size-8 p-0"
+              className="size-8 shrink-0 p-0"
             >
               <Image className="size-4" />
             </Toggle>
@@ -222,7 +222,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-0.5 border-b bg-muted/30 px-2 py-1.5",
+        "flex items-center gap-0.5 overflow-x-auto border-b bg-muted/30 px-2 py-1.5",
       )}
     >
       {/* History */}
@@ -241,7 +241,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Redo className="size-4" />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="mx-1 h-6 shrink-0" />
 
       {/* Headings */}
       <ToolbarButton
@@ -272,7 +272,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Heading3 className="size-4" />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="mx-1 h-6 shrink-0" />
 
       {/* Inline formatting */}
       <ToolbarButton
@@ -320,7 +320,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Highlighter className="size-4" />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="mx-1 h-6 shrink-0" />
 
       {/* Lists */}
       <ToolbarButton
@@ -342,7 +342,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <ListOrdered className="size-4" />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="mx-1 h-6 shrink-0" />
 
       {/* Block-level */}
       <ToolbarButton
@@ -372,7 +372,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Minus className="size-4" />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="mx-1 h-6 shrink-0" />
 
       {/* Text alignment */}
       <ToolbarButton
@@ -412,13 +412,13 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <AlignJustify className="size-4" />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="mx-1 h-6 shrink-0" />
 
       {/* Link & Image */}
       <LinkPopover editor={editor} />
       <ImagePopover editor={editor} />
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="mx-1 h-6 shrink-0" />
 
       {/* Clear formatting */}
       <ToolbarButton
