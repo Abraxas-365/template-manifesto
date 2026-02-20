@@ -18,8 +18,16 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import Underline from "@tiptap/extension-underline";
+import LinkExtension from "@tiptap/extension-link";
+import TextAlign from "@tiptap/extension-text-align";
+import Highlight from "@tiptap/extension-highlight";
+import Color from "@tiptap/extension-color";
+import { TextStyle } from "@tiptap/extension-text-style";
+import ImageExtension from "@tiptap/extension-image";
 import { common, createLowlight } from "lowlight";
 import { marked } from "marked";
+import { EditorToolbar } from "./editor-toolbar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -65,32 +73,31 @@ function DocumentEditor({ content }: { content: string }) {
       Placeholder.configure({
         placeholder: "Start writing or let the AI generate content…",
       }),
+      Underline,
+      LinkExtension.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: "text-primary underline underline-offset-4 cursor-pointer",
+        },
+      }),
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Highlight.configure({
+        multicolor: false,
+      }),
+      TextStyle,
+      Color,
+      ImageExtension.configure({
+        inline: false,
+        allowBase64: true,
+      }),
     ],
     content: htmlContent,
     editable: true,
     editorProps: {
       attributes: {
-        class:
-          "prose prose-neutral dark:prose-invert max-w-none focus:outline-none min-h-[300px] px-8 py-6 " +
-          // Heading styles
-          "prose-headings:font-display prose-headings:tracking-tight " +
-          "prose-h1:text-2xl prose-h1:font-bold prose-h1:border-b prose-h1:pb-2 prose-h1:mb-4 " +
-          "prose-h2:text-xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-3 " +
-          "prose-h3:text-lg prose-h3:font-semibold prose-h3:mt-6 " +
-          // Body
-          "prose-p:leading-7 prose-p:text-[15px] " +
-          // Lists
-          "prose-li:text-[15px] prose-li:leading-7 " +
-          "prose-ul:my-4 prose-ol:my-4 " +
-          // Code
-          "prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[13px] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none " +
-          "prose-pre:rounded-lg prose-pre:bg-[#1e1e2e] prose-pre:border prose-pre:border-border/50 prose-pre:shadow-sm " +
-          // Links
-          "prose-a:text-primary prose-a:underline-offset-4 prose-a:decoration-primary/30 hover:prose-a:decoration-primary " +
-          // Blockquotes
-          "prose-blockquote:border-l-primary/50 prose-blockquote:bg-muted/30 prose-blockquote:rounded-r-lg prose-blockquote:py-1 prose-blockquote:not-italic " +
-          // Strong
-          "prose-strong:font-semibold",
+        class: "tiptap-editor focus:outline-none min-h-[300px] px-8 py-6",
       },
     },
   });
@@ -106,7 +113,14 @@ function DocumentEditor({ content }: { content: string }) {
     }
   }, [editor, content]);
 
-  return <EditorContent editor={editor} />;
+  return (
+    <div className="flex h-full flex-col">
+      <EditorToolbar editor={editor} />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <EditorContent editor={editor} />
+      </div>
+    </div>
+  );
 }
 
 function ChatMessage({ msg }: { msg: MessageRecord }) {
@@ -344,7 +358,7 @@ export function SessionEditorPage() {
                   </Badge>
                 )}
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="min-h-0 flex-1">
               <DocumentEditor content={session.document.content} />
             </div>
           </div>
