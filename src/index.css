@@ -182,37 +182,48 @@
     pointer-events: none;
     @apply text-muted-foreground;
   }
-  .tiptap h1 {
-    @apply text-2xl font-bold;
-  }
-  .tiptap h2 {
-    @apply text-xl font-semibold;
-  }
-  .tiptap h3 {
-    @apply text-lg font-semibold;
-  }
-  .tiptap p {
-    @apply my-1;
-  }
-  .tiptap ul {
-    @apply ml-6 list-disc;
-  }
-  .tiptap ol {
-    @apply ml-6 list-decimal;
-  }
-  .tiptap li {
-    @apply my-0.5;
-  }
-  .tiptap blockquote {
-    @apply border-l-4 border-border pl-4 italic text-muted-foreground;
-  }
+
+  /* Syntax highlighting for code blocks (lowlight / highlight.js tokens) */
   .tiptap pre {
-    @apply my-2 rounded bg-muted p-3 font-mono text-sm;
+    @apply my-4 overflow-x-auto rounded-lg border border-border/50 p-4 font-mono text-[13px] leading-relaxed shadow-sm;
+    background: #1e1e2e;
+    color: #cdd6f4;
   }
-  .tiptap code {
-    @apply rounded bg-muted px-1 py-0.5 font-mono text-sm;
+  .tiptap pre code {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    color: inherit;
   }
-  .tiptap hr {
-    @apply my-4 border-border;
-  }
+  /* Catppuccin Mocha-inspired syntax tokens */
+  .tiptap pre .hljs-keyword,
+  .tiptap pre .hljs-selector-tag,
+  .tiptap pre .hljs-built_in,
+  .tiptap pre .hljs-type { color: #cba6f7; }
+  .tiptap pre .hljs-string,
+  .tiptap pre .hljs-attr,
+  .tiptap pre .hljs-template-variable { color: #a6e3a1; }
+  .tiptap pre .hljs-number,
+  .tiptap pre .hljs-literal { color: #fab387; }
+  .tiptap pre .hljs-comment,
+  .tiptap pre .hljs-quote { color: #6c7086; font-style: italic; }
+  .tiptap pre .hljs-function { color: #89b4fa; }
+  .tiptap pre .hljs-title,
+  .tiptap pre .hljs-title\.function_ { color: #89b4fa; }
+  .tiptap pre .hljs-title\.class_ { color: #f9e2af; }
+  .tiptap pre .hljs-variable,
+  .tiptap pre .hljs-params { color: #f38ba8; }
+  .tiptap pre .hljs-property { color: #89dceb; }
+  .tiptap pre .hljs-punctuation { color: #bac2de; }
+  .tiptap pre .hljs-meta { color: #f5e0dc; }
+  .tiptap pre .hljs-name,
+  .tiptap pre .hljs-tag { color: #cba6f7; }
+  .tiptap pre .hljs-attribute { color: #f9e2af; }
+  .tiptap pre .hljs-selector-id,
+  .tiptap pre .hljs-selector-class { color: #89b4fa; }
+  .tiptap pre .hljs-regexp { color: #f38ba8; }
+  .tiptap pre .hljs-symbol { color: #f2cdcd; }
+  .tiptap pre .hljs-deletion { color: #f38ba8; background: rgba(243,139,168,0.1); }
+  .tiptap pre .hljs-addition { color: #a6e3a1; background: rgba(166,227,161,0.1); }
 }
