@@ -1,4 +1,5 @@
-import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
@@ -125,12 +126,10 @@ const ALL_TOOL_IDS = AVAILABLE_TOOLS.map((t) => t.id);
 
 // ── Form data ────────────────────────────────────────────────────────────────
 
-interface ProjectFormData {
+interface TextFormData {
   name: string;
   description: string;
   system_prompt: string;
-  enabled_tools: string[];
-  kb_id: string; // "" means none
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -148,41 +147,32 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   const detachKB = useDetachKB();
   const { data: kbs } = useKnowledgeBases(1, 100);
 
-  const form = useForm<ProjectFormData>({
+  // Use plain React state for tools & KB to avoid form.watch() + React Compiler conflicts
+  const [enabledTools, setEnabledTools] = useState<string[]>(
+    () => project?.enabled_tools ?? [...ALL_TOOL_IDS],
+  );
+  const [selectedKBId, setSelectedKBId] = useState(
+    () => project?.kb_id ?? "",
+  );
+
+  const form = useForm<TextFormData>({
     defaultValues: {
       name: project?.name ?? "",
       description: project?.description ?? "",
       system_prompt: project?.system_prompt ?? "",
-      enabled_tools: project?.enabled_tools ?? ALL_TOOL_IDS,
-      kb_id: project?.kb_id ?? "",
     },
   });
 
-  const enabledTools = form.watch("enabled_tools");
-  const selectedKBId = form.watch("kb_id");
-
   const toggleTool = (toolId: string) => {
-    const current = form.getValues("enabled_tools");
-    if (current.includes(toolId)) {
-      form.setValue(
-        "enabled_tools",
-        current.filter((t) => t !== toolId),
-        { shouldDirty: true },
-      );
-    } else {
-      form.setValue("enabled_tools", [...current, toolId], {
-        shouldDirty: true,
-      });
-    }
+    setEnabledTools((prev) =>
+      prev.includes(toolId)
+        ? prev.filter((t) => t !== toolId)
+        : [...prev, toolId],
+    );
   };
 
-  const selectAll = () => {
-    form.setValue("enabled_tools", ALL_TOOL_IDS, { shouldDirty: true });
-  };
-
-  const deselectAll = () => {
-    form.setValue("enabled_tools", [], { shouldDirty: true });
-  };
+  const selectAll = () => setEnabledTools([...ALL_TOOL_IDS]);
+  const deselectAll = () => setEnabledTools([]);
 
   const isPending =
     createProject.isPending ||
@@ -197,15 +187,15 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           name: data.name,
           description: data.description || undefined,
           system_prompt: data.system_prompt || undefined,
-          enabled_tools: data.enabled_tools,
+          enabled_tools: enabledTools,
         };
         const created = await createProject.mutateAsync({ body });
 
         // Attach KB if selected
-        if (data.kb_id) {
+        if (selectedKBId) {
           await attachKB.mutateAsync({
             path: { id: created.id },
-            body: { kb_id: data.kb_id },
+            body: { kb_id: selectedKBId },
           });
         }
 
@@ -221,18 +211,18 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
             name: data.name,
             description: data.description,
             system_prompt: data.system_prompt,
-            enabled_tools: data.enabled_tools,
+            enabled_tools: enabledTools,
           },
         });
 
         // Handle KB changes
         const hadKB = !!project.kb_id;
-        const wantsKB = !!data.kb_id;
+        const wantsKB = !!selectedKBId;
 
-        if (wantsKB && data.kb_id !== project.kb_id) {
+        if (wantsKB && selectedKBId !== project.kb_id) {
           await attachKB.mutateAsync({
             path: { id: project.id },
-            body: { kb_id: data.kb_id },
+            body: { kb_id: selectedKBId },
           });
         } else if (hadKB && !wantsKB) {
           await detachKB.mutateAsync({ path: { id: project.id } });
@@ -258,6 +248,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
         <Button
           variant="ghost"
           size="icon"
+          type="button"
           onClick={() =>
             project
               ? navigate({
@@ -339,80 +330,74 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
             </div>
           </div>
 
-          <Controller
-            name="kb_id"
-            control={form.control}
-            render={({ field }) => (
-              <div className="flex flex-col gap-3">
-                <Select
-                  value={field.value || "none"}
-                  onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="No knowledge base" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No knowledge base</SelectItem>
-                    {kbs?.items?.map((kb) => (
-                      <SelectItem key={kb.id} value={kb.id}>
-                        {kb.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          <div className="flex flex-col gap-3">
+            <Select
+              value={selectedKBId || "none"}
+              onValueChange={(v) => setSelectedKBId(v === "none" ? "" : v)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="No knowledge base" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No knowledge base</SelectItem>
+                {kbs?.items?.map((kb) => (
+                  <SelectItem key={kb.id} value={kb.id}>
+                    {kb.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-                {selectedKB && (
-                  <div className="rounded-lg border bg-muted/50 p-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-sm font-medium">{selectedKB.name}</p>
-                        {selectedKB.description && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {selectedKB.description}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="size-6"
-                        onClick={() => field.onChange("")}
-                      >
-                        <X className="size-3" />
-                      </Button>
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {selectedKB.sources.length} source
-                        {selectedKB.sources.length !== 1 ? "s" : ""}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        Top {selectedKB.retrieval_top_k} results
-                      </Badge>
-                    </div>
+            {selectedKB && (
+              <div className="rounded-lg border bg-muted/50 p-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{selectedKB.name}</p>
+                    {selectedKB.description && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {selectedKB.description}
+                      </p>
+                    )}
                   </div>
-                )}
-
-                {!kbs?.items?.length && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Info className="size-4" />
-                    <span>
-                      No knowledge bases available.{" "}
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="h-auto p-0 text-sm"
-                        onClick={() => navigate({ to: "/kbs" })}
-                      >
-                        Create one
-                      </Button>
-                    </span>
-                  </div>
-                )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-6"
+                    onClick={() => setSelectedKBId("")}
+                  >
+                    <X className="size-3" />
+                  </Button>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {selectedKB.sources.length} source
+                    {selectedKB.sources.length !== 1 ? "s" : ""}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    Top {selectedKB.retrieval_top_k} results
+                  </Badge>
+                </div>
               </div>
             )}
-          />
+
+            {!kbs?.items?.length && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="size-4" />
+                <span>
+                  No knowledge bases available.{" "}
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto p-0 text-sm"
+                    onClick={() => navigate({ to: "/kbs" })}
+                  >
+                    Create one
+                  </Button>
+                </span>
+              </div>
+            )}
+          </div>
         </section>
 
         <Separator />
@@ -464,10 +449,10 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
                   {tools.map((tool) => {
                     const enabled = enabledTools.includes(tool.id);
                     return (
-                      <div
+                      <label
                         key={tool.id}
+                        htmlFor={`tool-${tool.id}`}
                         className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
-                        onClick={() => toggleTool(tool.id)}
                       >
                         <div className="flex flex-col gap-0.5 pr-4">
                           <span className="text-sm font-medium">
@@ -478,11 +463,11 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
                           </span>
                         </div>
                         <Switch
+                          id={`tool-${tool.id}`}
                           checked={enabled}
                           onCheckedChange={() => toggleTool(tool.id)}
-                          onClick={(e) => e.stopPropagation()}
                         />
-                      </div>
+                      </label>
                     );
                   })}
                 </div>
