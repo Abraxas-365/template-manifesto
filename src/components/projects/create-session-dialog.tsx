@@ -101,7 +101,7 @@ export function CreateSessionDialog({ projectId }: { projectId: string }) {
           New Session
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
@@ -115,7 +115,7 @@ export function CreateSessionDialog({ projectId }: { projectId: string }) {
             </div>
           </div>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="flex flex-col gap-5 pt-2">
+        <form onSubmit={onSubmit} className="flex flex-col gap-5 pt-2 overflow-y-auto min-h-0">
           {approvedPolicies.length > 0 && (
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="base-policy">
@@ -168,6 +168,7 @@ export function CreateSessionDialog({ projectId }: { projectId: string }) {
               id="doc-content"
               placeholder="Start writing or leave blank to begin from a template..."
               rows={5}
+              className="max-h-48"
               {...form.register("content")}
             />
           </div>
