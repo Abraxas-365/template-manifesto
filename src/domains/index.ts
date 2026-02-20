@@ -35,7 +35,7 @@ const schema = {
 
 const client = createApiClient({
   baseUrl: env.BACKEND_URL,
-  timeoutMs: 15_000,
+  timeoutMs: 60_000,
   credentials: "include",
   auth: tokenAuth(() => null, {
     onRefresh: async () => {
