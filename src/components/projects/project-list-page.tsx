@@ -1,7 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { FolderKanban, MoreHorizontal, Trash2 } from "lucide-react";
+import {
+  FolderKanban,
+  MoreHorizontal,
+  Trash2,
+  Plus,
+  BookOpen,
+  Wrench,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardDescription,
@@ -16,7 +24,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProjects, useDeleteProject } from "@/domains/projects/hooks";
-import { CreateProjectDialog } from "./create-project-dialog";
 
 export function ProjectListPage() {
   const { data, isLoading } = useProjects();
@@ -40,7 +47,12 @@ export function ProjectListPage() {
             Manage your AI editor projects
           </p>
         </div>
-        <CreateProjectDialog />
+        <Button asChild>
+          <Link to="/projects/new">
+            <Plus className="mr-2 size-4" />
+            New Project
+          </Link>
+        </Button>
       </div>
 
       {isLoading ? (
@@ -56,7 +68,12 @@ export function ProjectListPage() {
           <p className="text-muted-foreground mb-4">
             Create your first project to get started
           </p>
-          <CreateProjectDialog />
+          <Button asChild>
+            <Link to="/projects/new">
+              <Plus className="mr-2 size-4" />
+              New Project
+            </Link>
+          </Button>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -96,6 +113,18 @@ export function ProjectListPage() {
                   <CardDescription className="line-clamp-2">
                     {project.description || "No description"}
                   </CardDescription>
+                  <div className="flex gap-1.5 pt-1">
+                    {project.kb_id && (
+                      <Badge variant="secondary" className="text-xs gap-1">
+                        <BookOpen className="size-3" />
+                        KB
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="text-xs gap-1">
+                      <Wrench className="size-3" />
+                      {project.enabled_tools.length} tools
+                    </Badge>
+                  </div>
                 </CardHeader>
               </Link>
             </Card>

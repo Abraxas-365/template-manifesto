@@ -5,6 +5,9 @@ import {
   MoreHorizontal,
   Trash2,
   Archive,
+  Settings,
+  BookOpen,
+  Wrench,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -85,12 +88,30 @@ export function ProjectDetailPage() {
             <p className="text-muted-foreground">{project.description}</p>
           )}
         </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link
+            to="/projects/$projectId/settings"
+            params={{ projectId }}
+          >
+            <Settings className="mr-2 size-4" />
+            Settings
+          </Link>
+        </Button>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="secondary">{project.llm_config.model}</Badge>
         <Badge variant="outline">{project.editor_config.default_format}</Badge>
-        {project.kb_id && <Badge variant="default">KB attached</Badge>}
+        {project.kb_id && (
+          <Badge variant="default" className="gap-1">
+            <BookOpen className="size-3" />
+            KB attached
+          </Badge>
+        )}
+        <Badge variant="outline" className="gap-1">
+          <Wrench className="size-3" />
+          {project.enabled_tools.length} tools enabled
+        </Badge>
       </div>
 
       <div className="flex items-center justify-between">
