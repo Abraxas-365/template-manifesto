@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -64,7 +63,8 @@ function DocumentEditor({ content }: { content: string }) {
         breaks: false,
       }),
     ],
-    content: content || "",
+    // Initialize empty — content is set via setContent() so tiptap-markdown parses it
+    content: "",
     editable: true,
     editorProps: {
       attributes: {
@@ -93,10 +93,10 @@ function DocumentEditor({ content }: { content: string }) {
     },
   });
 
-  // Sync content when session data updates (e.g. after AI edit)
+  // Set content via setContent() so tiptap-markdown parses markdown→HTML properly.
+  // The initial `content` prop in useEditor is treated as HTML, not markdown.
   useEffect(() => {
     if (editor && content !== undefined) {
-      // Only update if content actually changed (avoid cursor jump)
       const storage = editor.storage as Record<string, any>;
       const currentMd = storage.markdown?.getMarkdown?.() ?? "";
       if (currentMd.trim() !== content.trim()) {
@@ -343,9 +343,9 @@ export function SessionEditorPage() {
                   </Badge>
                 )}
             </div>
-            <ScrollArea className="flex-1">
+            <div className="min-h-0 flex-1 overflow-y-auto">
               <DocumentEditor content={session.document.content} />
-            </ScrollArea>
+            </div>
           </div>
         </ResizablePanel>
 
@@ -368,7 +368,7 @@ export function SessionEditorPage() {
             </div>
 
             {/* Messages area */}
-            <ScrollArea className="flex-1">
+            <div className="min-h-0 flex-1 overflow-y-auto">
               <div className="flex flex-col gap-4 p-4">
                 {displayMessages.length === 0 && !isStreaming && (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -440,7 +440,7 @@ export function SessionEditorPage() {
 
                 <div ref={messagesEndRef} />
               </div>
-            </ScrollArea>
+            </div>
 
             {/* Input area */}
             <div className="border-t p-3">
