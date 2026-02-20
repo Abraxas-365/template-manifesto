@@ -21,12 +21,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { usePoliciesByProject, useDeletePolicy } from "@/domains/policies/hooks";
+import { usePolicies, usePoliciesByProject, useDeletePolicy } from "@/domains/policies/hooks";
 import { PolicyStatusBadge } from "./policy-status-badge";
 
 export function PolicyListPage() {
   const { projectId } = useSearch({ from: "/_authenticated/policies/" });
-  const { data, isLoading } = usePoliciesByProject(projectId ?? "");
+  const allPolicies = usePolicies();
+  const projectPolicies = usePoliciesByProject(projectId ?? "");
+  const { data, isLoading } = projectId ? projectPolicies : allPolicies;
   const deletePolicy = useDeletePolicy();
 
   const handleDelete = async (id: string) => {
@@ -47,19 +49,7 @@ export function PolicyListPage() {
         </p>
       </div>
 
-      {!projectId ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-card py-16">
-          <div className="flex size-14 items-center justify-center rounded-xl bg-muted">
-            <ShieldAlert className="text-muted-foreground size-7" />
-          </div>
-          <p className="text-muted-foreground mt-4 text-sm">
-            Select a project to view its policies.
-          </p>
-          <Button variant="outline" className="mt-4" asChild>
-            <Link to="/projects">Go to Projects</Link>
-          </Button>
-        </div>
-      ) : isLoading ? (
+      {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-xl" />

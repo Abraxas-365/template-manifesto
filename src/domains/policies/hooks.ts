@@ -1,6 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/domains";
 
+function invalidatePolicyLists(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({
+    queryKey: api.policies.list.$key({ query: {} }),
+  });
+  queryClient.invalidateQueries({
+    queryKey: api.policies.listByProject.$key({
+      path: { projectId: "" },
+      query: {},
+    }),
+  });
+}
+
+export function usePolicies(page = 1, pageSize = 20) {
+  return useQuery({
+    ...api.policies.list.$queryOptions({
+      query: { page, page_size: pageSize },
+    }),
+  });
+}
+
 export function usePoliciesByProject(
   projectId: string,
   page = 1,
@@ -28,12 +48,7 @@ export function useGeneratePolicy() {
   return useMutation({
     mutationFn: api.policies.generateFromSession.$mutationFn(),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: api.policies.listByProject.$key({
-          path: { projectId: "" },
-          query: {},
-        }),
-      });
+      invalidatePolicyLists(queryClient);
     },
   });
 }
@@ -47,12 +62,7 @@ export function useUpdatePolicy() {
       queryClient.invalidateQueries({
         queryKey: api.policies.get.$key({ path: { id: variables.path.id } }),
       });
-      queryClient.invalidateQueries({
-        queryKey: api.policies.listByProject.$key({
-          path: { projectId: "" },
-          query: {},
-        }),
-      });
+      invalidatePolicyLists(queryClient);
     },
   });
 }
@@ -63,12 +73,7 @@ export function useDeletePolicy() {
   return useMutation({
     mutationFn: api.policies.delete.$mutationFn(),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: api.policies.listByProject.$key({
-          path: { projectId: "" },
-          query: {},
-        }),
-      });
+      invalidatePolicyLists(queryClient);
     },
   });
 }
@@ -82,12 +87,7 @@ export function useSubmitForReview() {
       queryClient.invalidateQueries({
         queryKey: api.policies.get.$key({ path: { id: variables.path.id } }),
       });
-      queryClient.invalidateQueries({
-        queryKey: api.policies.listByProject.$key({
-          path: { projectId: "" },
-          query: {},
-        }),
-      });
+      invalidatePolicyLists(queryClient);
     },
   });
 }
@@ -101,12 +101,7 @@ export function useApprovePolicy() {
       queryClient.invalidateQueries({
         queryKey: api.policies.get.$key({ path: { id: variables.path.id } }),
       });
-      queryClient.invalidateQueries({
-        queryKey: api.policies.listByProject.$key({
-          path: { projectId: "" },
-          query: {},
-        }),
-      });
+      invalidatePolicyLists(queryClient);
     },
   });
 }
@@ -120,12 +115,7 @@ export function useRetirePolicy() {
       queryClient.invalidateQueries({
         queryKey: api.policies.get.$key({ path: { id: variables.path.id } }),
       });
-      queryClient.invalidateQueries({
-        queryKey: api.policies.listByProject.$key({
-          path: { projectId: "" },
-          query: {},
-        }),
-      });
+      invalidatePolicyLists(queryClient);
     },
   });
 }

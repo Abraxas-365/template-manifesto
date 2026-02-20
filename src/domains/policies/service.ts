@@ -16,6 +16,15 @@ export const policiesSchema = {
     response: { ok: t<PolicyDTO>() },
   }),
 
+  list: endpoint({
+    method: "GET",
+    path: "/api/v1/editor/policies",
+    request: {
+      query: t<{ page?: number; page_size?: number }>(),
+    },
+    response: { ok: t<PaginatedResponse<PolicyDTO>>() },
+  }),
+
   listByProject: endpoint({
     method: "GET",
     path: "/api/v1/editor/policies/project/:projectId",
