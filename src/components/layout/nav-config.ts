@@ -44,7 +44,7 @@ export const navConfig: NavGroup[] = [
         ],
       },
       {
-        label: "Templates",
+        label: "Knowledge Base",
         to: "/kbs",
         icon: FileStack,
       },

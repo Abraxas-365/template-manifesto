@@ -272,8 +272,8 @@ function LoginPage() {
                   <FileText className="size-5 text-[#f4a292]" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">Smart Templates</p>
-                  <p className="text-xs text-slate-400">Pre-built ISO 27001 document frameworks</p>
+                  <p className="text-sm font-medium text-white">Knowledge Base</p>
+                  <p className="text-xs text-slate-400">Pre-built ISO 27001 reference frameworks</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm transition-colors hover:bg-white/10">
